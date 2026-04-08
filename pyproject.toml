@@ -1,5 +1,5 @@
 [project]
-name = "jinxizhice-platform"
+name = "myproject"
 version = "0.4.2.dev"
 description = "智能体赋能的金融数据分析与决策支持系统（金析智策）：LangGraph 多智能体 + RAG/知识图谱 + FastAPI + Vue，可扩展 MCP 与行情/新闻等数据工具"
 readme = "README.md"
