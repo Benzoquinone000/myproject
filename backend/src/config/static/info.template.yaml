@@ -1,0 +1,53 @@
+# 系统信息配置（默认模板）
+# 赛题包装：智能体赋能的数据智能分析与决策支持 · 金融方向
+# 如需恢复通用版或自定义，可复制为 info.local.yaml 并设置环境变量 BRAND_FILE_PATH
+
+organization:
+  name: "金析智策"
+  logo: "/favicon.svg"
+  avatar: "/avatar.jpg"
+  login_bg: "/login-bg.jpg"
+
+branding:
+  name: "金析智策"
+  title: "金析智策 — 智能体赋能的金融数据分析与决策支持系统"
+  tagline: "金融数据分析与决策支持"
+  hero_badge: "大数据 · 多智能体 · 决策支持"
+  subtitle: "多智能体协同研判 · 知识图谱与 RAG · 服务研报与风险管理场景"
+  description: "融合非结构化金融文档、向量检索与图谱推理，支持行情、财报与新闻等多源数据的智能分析与可视化决策辅助。"
+
+footer:
+  copyright: "© 金析智策 2026"
+
+# 首页与能力展示（前端部分视图仍使用内置卡片；此处供扩展与文档一致性）
+features:
+  - label: "金融多智能体"
+    value: "协同"
+    description: "数据获取、分析推理、可视化与报告子智能体分工协作"
+    icon: "brain"
+  - label: "数据与知识融合"
+    value: "RAG+图谱"
+    description: "Milvus 向量检索与 Neo4j 知识图谱联合增强金融问答"
+    icon: "search"
+  - label: "多源金融数据"
+    value: "可扩展"
+    description: "通过 MCP/工具链接行情、新闻与内部知识库"
+    icon: "graph"
+  - label: "决策辅助输出"
+    value: "可追溯"
+    description: "结构化研报要点、图表与引用路径，便于复核与展示"
+    icon: "docs"
+
+actions:
+  - name: "金融智能体"
+    icon: "start"
+    url: "/agent"
+  - name: "知识库"
+    icon: "docs"
+    url: "/database"
+  - name: "知识图谱"
+    icon: "graph"
+    url: "/graph"
+  - name: "仪表盘"
+    icon: "dashboard"
+    url: "/dashboard"

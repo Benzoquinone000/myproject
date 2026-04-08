@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金析智策 - 项目完整文档</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <style>
+        :root { --bg-dark: #0f172a; --bg-card: #1e293b; --bg-code: #0d1117; --accent: #3b82f6; --accent2: #a855f7; --accent3: #22c55e; }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        body { background: var(--bg-dark); color: #e2e8f0; margin: 0; line-height: 1.7; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        /* Sidebar */
+        .sidebar { position: fixed; top: 0; left: 0; width: 280px; height: 100vh; background: #0b1120; border-right: 1px solid rgba(255,255,255,0.08); overflow-y: auto; z-index: 100; padding: 1rem 0; transition: transform 0.3s; }
+        .sidebar-brand { padding: 1rem 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-brand h1 { font-size: 1.25rem; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .sidebar-brand p { font-size: 0.7rem; color: #64748b; margin: 0.25rem 0 0; }
+        .nav-section { padding: 0.75rem 0; }
+        .nav-item { display: flex; align-items: center; padding: 0.5rem 1.25rem; color: #94a3b8; font-size: 0.8rem; text-decoration: none; transition: all 0.15s; cursor: pointer; border-left: 3px solid transparent; }
+        .nav-item:hover { color: #e2e8f0; background: rgba(255,255,255,0.04); }
+        .nav-item.active { color: #60a5fa; background: rgba(59,130,246,0.1); border-left-color: #3b82f6; font-weight: 600; }
+        .nav-item .num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,0.06); font-size: 0.65rem; font-weight: 600; margin-right: 0.75rem; flex-shrink: 0; }
+        .nav-sub { padding-left: 2.5rem; }
+        .nav-sub .nav-item { font-size: 0.75rem; padding: 0.35rem 1rem; border-left: none; }
+        .nav-sub .nav-item::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #475569; margin-right: 0.75rem; flex-shrink: 0; }
+        .nav-sub .nav-item.active::before { background: #3b82f6; }
+        .nav-group-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .nav-group-toggle svg { width: 14px; height: 14px; transition: transform 0.2s; }
+        .nav-group.open .nav-group-toggle svg { transform: rotate(90deg); }
+        .nav-group .nav-sub { display: none; }
+        .nav-group.open .nav-sub { display: block; }
+        /* Main */
+        .main { margin-left: 280px; min-height: 100vh; }
+        .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.75rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .search-box { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.4rem 1rem; color: #e2e8f0; font-size: 0.8rem; width: 280px; outline: none; transition: border-color 0.2s; }
+        .search-box:focus { border-color: #3b82f6; }
+        .search-box::placeholder { color: #64748b; }
+        .content { padding: 2rem; max-width: 960px; margin: 0 auto; }
+        /* Cards */
+        .doc-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; }
+        .doc-card h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .doc-card h3 { font-size: 1.15rem; font-weight: 600; color: #93c5fd; margin: 1.75rem 0 0.75rem; }
+        .doc-card h4 { font-size: 0.95rem; font-weight: 600; color: #c4b5fd; margin: 1.25rem 0 0.5rem; padding-left: 0.75rem; border-left: 3px solid #a855f7; }
+        /* Tables */
+        .doc-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 1rem 0; }
+        .doc-table th { background: rgba(255,255,255,0.06); padding: 0.6rem 0.75rem; text-align: left; font-weight: 600; color: #93c5fd; border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+        .doc-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: #cbd5e1; }
+        .doc-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .doc-table code { background: rgba(139,92,246,0.15); color: #c4b5fd; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.75rem; }
+        /* Code blocks */
+        .code-wrap { position: relative; margin: 1rem 0; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+        .code-wrap .lang-tag { position: absolute; top: 0; right: 0; padding: 0.2rem 0.75rem; background: rgba(255,255,255,0.08); color: #64748b; font-size: 0.65rem; border-bottom-left-radius: 8px; text-transform: uppercase; font-weight: 600; }
+        .code-wrap .copy-btn { position: absolute; top: 0.4rem; right: 4rem; padding: 0.2rem 0.5rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: #94a3b8; font-size: 0.65rem; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+        .code-wrap:hover .copy-btn { opacity: 1; }
+        .code-wrap .copy-btn:hover { background: rgba(255,255,255,0.15); color: #e2e8f0; }
+        .code-wrap pre { margin: 0; padding: 1.25rem; background: var(--bg-code) !important; overflow-x: auto; }
+        .code-wrap code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6; }
+        /* ASCII art blocks */
+        .ascii-block { background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.25rem; margin: 1rem 0; overflow-x: auto; }
+        .ascii-block pre { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.5; color: #86efac; white-space: pre; }
+        /* Lists */
+        .doc-card ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+        .doc-card ul li { margin: 0.3rem 0; color: #cbd5e1; font-size: 0.85rem; }
+        .doc-card ul li::marker { color: #3b82f6; }
+        .doc-card ul li strong { color: #93c5fd; }
+        /* Blockquote */
+        .doc-quote { border-left: 3px solid #3b82f6; background: rgba(59,130,246,0.08); padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: #93c5fd; }
+        /* Inline code */
+        .doc-card p code, .doc-card li code { background: rgba(139,92,246,0.15); color: #c4b5fd; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+        .doc-card p { font-size: 0.85rem; color: #cbd5e1; margin: 0.5rem 0; }
+        /* Badge */
+        .badge { display: inline-flex; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
+        .badge-blue { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-green { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .badge-purple { background: rgba(168,85,247,0.2); color: #c084fc; }
+        .badge-orange { background: rgba(249,115,22,0.2); color: #fb923c; }
+        .badge-red { background: rgba(239,68,68,0.2); color: #f87171; }
+        /* Back to top */
+        .back-top { position: fixed; bottom: 2rem; right: 2rem; width: 40px; height: 40px; border-radius: 50%; background: rgba(59,130,246,0.8); color: white; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .back-top:hover { transform: scale(1.1); }
+        .back-top.show { display: flex; }
+        /* Mobile */
+        .menu-toggle { display: none; background: none; border: none; color: #e2e8f0; cursor: pointer; padding: 0.5rem; }
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+            .main { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+            .overlay.show { display: block; }
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+        /* Section colors */
+        .sec-1 h2 { color: #60a5fa; } .sec-2 h2 { color: #34d399; } .sec-3 h2 { color: #fb923c; }
+        .sec-4 h2 { color: #a78bfa; } .sec-5 h2 { color: #22d3ee; } .sec-6 h2 { color: #f472b6; }
+        .sec-7 h2 { color: #60a5fa; } .sec-8 h2 { color: #f87171; } .sec-9 h2 { color: #fbbf24; }
+        .sec-10 h2 { color: #34d399; } .sec-11 h2 { color: #c084fc; }
+        /* Search highlight */
+        mark { background: rgba(250,204,21,0.3); color: #fef08a; padding: 0 2px; border-radius: 2px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h1>金析智策</h1>
+            <p>JinXiZhiCe Platform v0.4.2.dev</p>
+        </div>
+        <div class="nav-section">
+            <a class="nav-item" href="#sec-1"><span class="num">1</span>项目概述</a>
+            <a class="nav-item" href="#sec-2"><span class="num">2</span>技术栈总览</a>
+            <a class="nav-item" href="#sec-3"><span class="num">3</span>系统架构</a>
+            <a class="nav-item" href="#sec-4"><span class="num">4</span>目录结构</a>
+            <div class="nav-group open" id="nav-group-5">
+                <a class="nav-item" onclick="toggleNavGroup('nav-group-5')"><span class="num">5</span><span class="nav-group-toggle">后端架构详解<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></span></a>
+                <div class="nav-sub">
+                    <a class="nav-item" href="#sec-5-1">5.1 接入层</a>
+                    <a class="nav-item" href="#sec-5-2">5.2 路由层</a>
+                    <a class="nav-item" href="#sec-5-3">5.3 鉴权体系</a>
+                    <a class="nav-item" href="#sec-5-4">5.4 智能体系统</a>
+                    <a class="nav-item" href="#sec-5-5">5.5 知识库系统</a>
+                    <a class="nav-item" href="#sec-5-6">5.6 知识图谱</a>
+                    <a class="nav-item" href="#sec-5-7">5.7 对话管理</a>
+                    <a class="nav-item" href="#sec-5-8">5.8 任务系统</a>
+                    <a class="nav-item" href="#sec-5-9">5.9 评测系统</a>
+                    <a class="nav-item" href="#sec-5-10">5.10 内容审核</a>
+                    <a class="nav-item" href="#sec-5-11">5.11 文档处理插件</a>
+                    <a class="nav-item" href="#sec-5-12">5.12 模型管理</a>
+                    <a class="nav-item" href="#sec-5-13">5.13 配置系统</a>
+                </div>
+            </div>
+            <a class="nav-item" href="#sec-6"><span class="num">6</span>API 接口文档</a>
+            <a class="nav-item" href="#sec-7"><span class="num">7</span>前端架构详解</a>
+            <a class="nav-item" href="#sec-8"><span class="num">8</span>数据模型</a>
+            <a class="nav-item" href="#sec-9"><span class="num">9</span>存储层架构</a>
+            <a class="nav-item" href="#sec-10"><span class="num">10</span>部署与运维</a>
+            <a class="nav-item" href="#sec-11"><span class="num">11</span>设计模式总结</a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="top-bar">
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                </button>
+                <div style="font-size:0.85rem;font-weight:600;color:#94a3b8;">金析智策 项目文档</div>
+            </div>
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索文档内容..." oninput="handleSearch(this.value)">
+        </div>
+        <div class="content" id="content">
+
+            <!-- Section 1: Project Overview -->
+            <div class="doc-card sec-1" id="sec-1" data-section>
+                <h2>1. 项目概述</h2>
+                <p><strong>金析智策</strong>（jinxizhice-platform）是一个面向金融领域的智能分析与决策支持平台。系统通过多智能体协作、RAG 检索增强生成、知识图谱等技术，为用户提供智能化的金融数据分析、知识管理和决策辅助能力。</p>
+                <div class="doc-quote">版本 0.4.2.dev &middot; Python &ge; 3.11 &middot; LangGraph 多智能体 + RAG/知识图谱 + FastAPI + Vue 3</div>
+                <h3>核心能力</h3>
+                <table class="doc-table">
+                    <thead><tr><th>能力模块</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>多智能体对话</strong></td><td>基于 LangGraph 状态机的多智能体系统，支持流式对话、工具调用、人工审批中断</td></tr>
+                        <tr><td><strong>知识库管理</strong></td><td>支持 Milvus 向量检索与 LightRAG 图增强检索，40+ 文档格式解析</td></tr>
+                        <tr><td><strong>知识图谱</strong></td><td>Neo4j 图数据库驱动，支持实体/关系可视化、子图查询、向量索引</td></tr>
+                        <tr><td><strong>RAG 评测</strong></td><td>基准数据集管理、自动评测、指标计算（召回率、准确率等）</td></tr>
+                        <tr><td><strong>思维导图</strong></td><td>AI 驱动的文档结构化，自动生成层级思维导图</td></tr>
+                        <tr><td><strong>数据看板</strong></td><td>多维度统计分析：用户活跃度、智能体使用、工具调用、知识库状态</td></tr>
+                        <tr><td><strong>内容审核</strong></td><td>关键词 + LLM 双模式内容安全审核</td></tr>
+                        <tr><td><strong>MCP 协议</strong></td><td>支持 Model Context Protocol 外部工具扩展</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 2: Tech Stack -->
+            <div class="doc-card sec-2" id="sec-2" data-section>
+                <h2>2. 技术栈总览</h2>
+                <h3>后端</h3>
+                <table class="doc-table">
+                    <thead><tr><th>类别</th><th>技术</th><th>版本</th></tr></thead>
+                    <tbody>
+                        <tr><td>Web 框架</td><td>FastAPI + Uvicorn</td><td>&ge; 0.121</td></tr>
+                        <tr><td>智能体框架</td><td>LangGraph + LangChain</td><td>&ge; 1.0</td></tr>
+                        <tr><td>ORM</td><td>SQLAlchemy (async)</td><td>&ge; 2.0</td></tr>
+                        <tr><td>数据库</td><td>SQLite (aiosqlite)</td><td>-</td></tr>
+                        <tr><td>向量数据库</td><td>Milvus (pymilvus)</td><td>v2.5.6</td></tr>
+                        <tr><td>图数据库</td><td>Neo4j (neo4j-driver)</td><td>5.26</td></tr>
+                        <tr><td>对象存储</td><td>MinIO</td><td>-</td></tr>
+                        <tr><td>LLM 接入</td><td>OpenAI / DeepSeek / DashScope / SiliconFlow</td><td>-</td></tr>
+                        <tr><td>Embedding</td><td>BAAI/bge-m3 (默认)</td><td>-</td></tr>
+                        <tr><td>Reranker</td><td>BAAI/bge-reranker-v2-m3 (默认)</td><td>-</td></tr>
+                        <tr><td>图增强 RAG</td><td>LightRAG-HKU</td><td>&ge; 1.4.6</td></tr>
+                        <tr><td>文档解析</td><td>Docling / MinerU / PaddleX / RapidOCR</td><td>-</td></tr>
+                        <tr><td>网页搜索</td><td>Tavily</td><td>-</td></tr>
+                        <tr><td>MCP 协议</td><td>langchain-mcp-adapters</td><td>&ge; 0.1.9</td></tr>
+                        <tr><td>配置管理</td><td>Pydantic + TOML</td><td>-</td></tr>
+                        <tr><td>包管理</td><td>uv</td><td>-</td></tr>
+                    </tbody>
+                </table>
+                <h3>前端</h3>
+                <table class="doc-table">
+                    <thead><tr><th>类别</th><th>技术</th><th>版本</th></tr></thead>
+                    <tbody>
+                        <tr><td>框架</td><td>Vue 3 (Composition API)</td><td>3.5.21</td></tr>
+                        <tr><td>构建工具</td><td>Vite</td><td>7.1.5</td></tr>
+                        <tr><td>状态管理</td><td>Pinia (持久化插件)</td><td>3.0.3</td></tr>
+                        <tr><td>路由</td><td>Vue Router</td><td>4.5.1</td></tr>
+                        <tr><td>UI 组件库</td><td>Ant Design Vue</td><td>4.2.6</td></tr>
+                        <tr><td>图表</td><td>ECharts + ECharts GL</td><td>6.0.0</td></tr>
+                        <tr><td>图可视化</td><td>AntV G6 / Sigma / Graphology / D3</td><td>-</td></tr>
+                        <tr><td>思维导图</td><td>Markmap</td><td>-</td></tr>
+                        <tr><td>Markdown</td><td>Marked + md-editor-v3 + Highlight.js</td><td>-</td></tr>
+                        <tr><td>工具库</td><td>VueUse / dayjs / Lucide Icons</td><td>-</td></tr>
+                        <tr><td>包管理</td><td>pnpm</td><td>10.11.0</td></tr>
+                    </tbody>
+                </table>
+                <h3>基础设施</h3>
+                <table class="doc-table">
+                    <thead><tr><th>组件</th><th>说明</th><th>端口</th></tr></thead>
+                    <tbody>
+                        <tr><td>api</td><td>FastAPI 后端服务</td><td>5050</td></tr>
+                        <tr><td>web</td><td>Vue 3 前端开发服务</td><td>5173</td></tr>
+                        <tr><td>graph</td><td>Neo4j 图数据库</td><td>7474 / 7687</td></tr>
+                        <tr><td>milvus</td><td>Milvus 向量数据库</td><td>19530</td></tr>
+                        <tr><td>etcd</td><td>Milvus 元数据存储</td><td>2379</td></tr>
+                        <tr><td>minio</td><td>MinIO 对象存储</td><td>9000 / 9001</td></tr>
+                        <tr><td>mineru</td><td>MinerU GPU 文档解析（可选）</td><td>30000</td></tr>
+                        <tr><td>paddlex</td><td>PaddleX GPU 文档解析（可选）</td><td>8080</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 3: Architecture -->
+            <div class="doc-card sec-3" id="sec-3" data-section>
+                <h2>3. 系统架构</h2>
+                <p>系统采用经典的分层架构：<strong>客户端层 &rarr; 接入层 &rarr; 路由层 &rarr; 领域服务层 &rarr; 数据存储层</strong>，并通过外部服务集成 LLM、Embedding、搜索等能力。</p>
+                <div style="margin:1rem 0;text-align:center;"><img src="系统架构图.jpg" alt="金析智策系统架构图" style="max-width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.1);"></div>
+                <div class="ascii-block"><pre>&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                     客户端层  Vue 3 SPA                      &#9474;
+&#9474;   Pinia &middot; Vue Router &middot; Ant Design Vue &middot; ECharts &middot; Sigma     &#9474;
+&#9474;   APIs: agent / knowledge / graph / dashboard / system       &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                           &#9474; HTTP REST / SSE
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;               接入层  FastAPI &middot; Uvicorn :5050                &#9474;
+&#9474;       CORS &rarr; Auth &rarr; LoginRateLimit(10/60s) &rarr; AccessLog       &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                           &#9474;
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;  路由层  auth&#9474;chat&#9474;knowledge&#9474;graph&#9474;eval&#9474;mindmap&#9474;dash&#9474;task&#9474;sys &#9474;
+&#9474;  鉴权: PUBLIC_PATHS &middot; get_required_user &middot; get_admin_user     &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                           &#9474;
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9660;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                      领域服务层                               &#9474;
+&#9474;  &#9484; 智能体 &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488; &#9484; 知识库 &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488; &#9484; 支撑服务 &#9472;&#9472;&#9488; &#9474;
+&#9474;  &#9474; AgentManager      &#9474; &#9474; KBManager      &#9474; &#9474; Conversation&#9474; &#9474;
+&#9474;  &#9474; BaseAgent(Graph)  &#9474; &#9474; MilvusKB       &#9474; &#9474; Tasker      &#9474; &#9474;
+&#9474;  &#9474; Tools + MCP       &#9474; &#9474; LightRagKB     &#9474; &#9474; GraphAdapter&#9474; &#9474;
+&#9474;  &#9474; SubAgents         &#9474; &#9474; DocPlugins     &#9474; &#9474; Evaluation  &#9474; &#9474;
+&#9474;  &#9474; Middleware        &#9474; &#9474; Embed/Rerank   &#9474; &#9474; ContentGuard&#9474; &#9474;
+&#9474;  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496; &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496; &#9474; Config      &#9474; &#9474;
+&#9474;                                            &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496; &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+    &#9474;          &#9474;          &#9474;          &#9474;          &#9474;
+ SQLite    Milvus     Neo4j     MinIO     saves/
+ 用户&middot;会话   向量索引    知识图谱    对象存储    配置&middot;日志
+
+    &#9650;          &#9650;                              &#9650;
+    &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472; 外部服务 &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+    LLM API (SiliconFlow/OpenAI/DeepSeek/DashScope)
+    Embedding API &middot; Tavily 搜索 &middot; MCP 服务
+    MinerU / PaddleX GPU 解析（可选）</pre></div>
+            </div>
+
+            <!-- Section 4: Directory Structure -->
+            <div class="doc-card sec-4" id="sec-4" data-section>
+                <h2>4. 目录结构</h2>
+                <div class="ascii-block"><pre>jinxizhice-platform/
+├── backend/
+│   ├── server/                          # FastAPI 应用层
+│   │   ├── main.py                      # 应用入口，中间件注册
+│   │   ├── routers/                     # 路由模块（9 个）
+│   │   ├── services/tasker.py           # 异步任务队列服务
+│   │   └── utils/                       # 鉴权/日志/迁移/工具
+│   └── src/                             # 核心业务逻辑
+│       ├── agents/                      # 智能体系统
+│       │   ├── common/                  # 公共基础设施（base/context/state/tools/mcp/middlewares）
+│       │   ├── chatbot/                 # 通用对话智能体
+│       │   ├── deep_agent/              # 深度推理智能体
+│       │   └── finance_agent/           # 金融分析智能体
+│       ├── knowledge/                   # 知识库系统
+│       │   ├── implementations/         # MilvusKB / LightRagKB
+│       │   ├── adapters/                # 图谱适配器
+│       │   └── chunking/ragflow_like/   # 文档分块
+│       ├── storage/                     # 存储层（db/conversation/minio）
+│       ├── models/                      # 模型管理（chat/embed/rerank）
+│       ├── plugins/                     # 文档处理插件 + 内容审核
+│       ├── services/                    # 评测服务 + 文档转换
+│       ├── config/                      # Pydantic 配置
+│       └── utils/                       # 工具函数
+├── frontend/src/
+│   ├── apis/                            # API 服务层（9 个模块）
+│   ├── components/                      # Vue 组件（61 个）
+│   ├── composables/                     # 组合式函数（3 个）
+│   ├── stores/                          # Pinia 状态仓库（9 个）
+│   ├── views/                           # 页面组件（10 个）
+│   └── utils/                           # 工具函数（14 个）
+├── docker/                              # Dockerfile + volumes
+├── saves/                               # 运行时数据（agents/config/db/kb/logs/tasks）
+├── docker-compose.yml                   # 开发环境编排
+├── pyproject.toml                       # Python 项目配置
+└── .env                                 # 环境变量</pre></div>
+            </div>
+
+            <!-- Section 5: Backend Architecture -->
+            <div class="doc-card sec-5" id="sec-5" data-section>
+                <h2>5. 后端架构详解</h2>
+
+                <!-- 5.1 -->
+                <h3 id="sec-5-1">5.1 接入层（FastAPI 网关）</h3>
+                <p>入口文件：<code>backend/server/main.py</code>，通过 Uvicorn 运行在 <code>:5050</code> 端口。</p>
+                <div class="ascii-block"><pre>请求 → CORSMiddleware → AuthMiddleware → LoginRateLimitMiddleware → AccessLogMiddleware → 路由处理</pre></div>
+                <table class="doc-table">
+                    <thead><tr><th>中间件</th><th>职责</th><th>关键逻辑</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>CORSMiddleware</code></td><td>跨域资源共享</td><td>允许所有来源</td></tr>
+                        <tr><td><code>AuthMiddleware</code></td><td>身份认证</td><td>检查公开路径白名单，非 API 路径直接放行</td></tr>
+                        <tr><td><code>LoginRateLimitMiddleware</code></td><td>登录限流</td><td>POST /api/auth/token，每 IP 60s 内最多 10 次</td></tr>
+                        <tr><td><code>AccessLogMiddleware</code></td><td>访问日志</td><td>记录请求处理时间和状态码</td></tr>
+                    </tbody>
+                </table>
+                <h4>限流实现</h4>
+                <div class="code-wrap"><span class="lang-tag">python</span><pre><code class="language-python"># 内存级滑动窗口限流
+_login_attempts: defaultdict[str, deque[float]] = defaultdict(deque)
+
+# IP 提取优先级：X-Forwarded-For → request.client.host → "unknown"
+# 登录成功（status &lt; 400）后自动清除该 IP 的尝试记录
+# 返回 429 时携带 Retry-After 头</code></pre></div>
+
+                <!-- 5.2 -->
+                <h3 id="sec-5-2">5.2 路由层</h3>
+                <p>所有路由注册在 <code>/api</code> 前缀下，共 9 个路由模块：</p>
+                <table class="doc-table">
+                    <thead><tr><th>路由模块</th><th>前缀</th><th>职责</th><th>规模</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>auth_router</code></td><td>/api/auth</td><td>登录·注册·用户管理</td><td>中</td></tr>
+                        <tr><td><code>chat_router</code></td><td>/api/chat</td><td>对话·线程·反馈·附件</td><td>大（1400+行）</td></tr>
+                        <tr><td><code>knowledge_router</code></td><td>/api/knowledge</td><td>知识库 CRUD·文档·查询</td><td>大</td></tr>
+                        <tr><td><code>graph_router</code></td><td>/api/graph</td><td>图谱列表·子图·实体</td><td>中</td></tr>
+                        <tr><td><code>evaluation_router</code></td><td>/api/evaluation</td><td>基准·评测</td><td>中</td></tr>
+                        <tr><td><code>mindmap_router</code></td><td>/api/mindmap</td><td>思维导图</td><td>小</td></tr>
+                        <tr><td><code>dashboard_router</code></td><td>/api/dashboard</td><td>统计·会话·反馈</td><td>大</td></tr>
+                        <tr><td><code>task_router</code></td><td>/api/tasks</td><td>任务列表·取消</td><td>小</td></tr>
+                        <tr><td><code>system_router</code></td><td>/api/system</td><td>健康·配置·日志·OCR·Provider</td><td>大</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- 5.3 -->
+                <h3 id="sec-5-3">5.3 鉴权体系</h3>
+                <p>JWT Bearer Token 鉴权，FastAPI 依赖注入实现三级权限控制：</p>
+                <table class="doc-table">
+                    <thead><tr><th>依赖函数</th><th>权限级别</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>get_current_user</code></td><td>可选</td><td>有 Token 则解析，无 Token 返回 None</td></tr>
+                        <tr><td><code>get_required_user</code></td><td>必须登录</td><td>无有效 Token 返回 401</td></tr>
+                        <tr><td><code>get_admin_user</code></td><td>管理员</td><td>要求 role 为 admin 或 superadmin</td></tr>
+                    </tbody>
+                </table>
+                <h4>公开路径（无需认证）</h4>
+                <ul>
+                    <li><code>POST /api/auth/token</code> — 登录</li>
+                    <li><code>GET /api/auth/check-first-run</code> — 首次运行检查</li>
+                    <li><code>POST /api/auth/initialize</code> — 初始化管理员</li>
+                    <li><code>POST /api/auth/register</code> — 用户注册</li>
+                    <li><code>GET /api/system/health</code> — 健康检查</li>
+                    <li><code>GET /api/system/info</code> — 系统信息</li>
+                </ul>
+                <h4>用户角色</h4>
+                <table class="doc-table">
+                    <thead><tr><th>角色</th><th>权限</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>superadmin</code></td><td>最高权限，系统初始化时创建</td></tr>
+                        <tr><td><code>admin</code></td><td>管理权限，可管理用户、配置、知识库等</td></tr>
+                        <tr><td><code>user</code></td><td>普通用户，仅可使用对话功能</td></tr>
+                    </tbody>
+                </table>
+                <h4>登录安全机制</h4>
+                <ul>
+                    <li><strong>IP 级限流</strong>：60 秒内最多 10 次登录尝试（中间件层）</li>
+                    <li><strong>账户级锁定</strong>：连续失败 10 次后锁定，时间指数递增（2^(n-10) 秒），最长 365 天</li>
+                    <li><strong>密码哈希</strong>：使用安全哈希存储</li>
+                    <li><strong>软删除</strong>：用户删除为逻辑删除（is_deleted 标记）</li>
+                </ul>
+
+                <!-- 5.4 -->
+                <h3 id="sec-5-4">5.4 智能体系统</h3>
+                <p>基于 LangGraph 状态机实现多智能体协作，是金析智策的核心。</p>
+                <div class="ascii-block"><pre>AgentManager（单例·自动发现）
+├── ChatbotAgent      — 通用对话智能体
+├── DeepAgent         — 深度推理智能体
+└── FinanceAgent      — 金融分析智能体
+
+每个 Agent 内部：
+BaseAgent (抽象基类)
+├── get_graph()       → CompiledStateGraph (LangGraph)
+├── stream_messages() → 异步流式输出
+├── invoke_messages() → 同步调用
+├── get_info()        → 智能体元信息
+└── load_metadata()   → 从 metadata.toml 加载配置</pre></div>
+                <h4>BaseAgent 抽象基类</h4>
+                <div class="code-wrap"><span class="lang-tag">python</span><pre><code class="language-python">class BaseAgent:
+    name = "base_agent"
+    capabilities: list[str] = []          # 能力声明
+    context_schema: type[BaseContext] = BaseContext
+
+    # 核心属性
+    module_name → str    # 模块名（自动推断）
+    id → str             # 类名作为唯一标识
+    workdir → Path       # saves/agents/{module_name}/
+    checkpointer         # AsyncSqliteSaver 或 InMemorySaver</code></pre></div>
+                <h4>上下文系统（BaseContext）</h4>
+                <p>三级配置优先级：<strong>运行时配置 &gt; 文件配置 &gt; 类默认值</strong></p>
+                <h4>智能体中间件</h4>
+                <table class="doc-table">
+                    <thead><tr><th>中间件</th><th>职责</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>DynamicToolMiddleware</code></td><td>运行时动态选择工具，预加载 MCP 工具并按上下文过滤</td></tr>
+                        <tr><td><code>context_aware_prompt()</code></td><td>根据运行时上下文动态生成系统提示词</td></tr>
+                        <tr><td><code>context_based_model()</code></td><td>根据运行时上下文动态选择 LLM 模型</td></tr>
+                        <tr><td><code>AttachmentMiddleware</code></td><td>处理文件附件，注入到消息上下文</td></tr>
+                    </tbody>
+                </table>
+                <h4>三种智能体</h4>
+                <table class="doc-table">
+                    <thead><tr><th>智能体</th><th>模块</th><th>定位</th><th>特色</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ChatbotAgent</code></td><td>chatbot/</td><td>通用对话</td><td>文件上传、可配置工具和知识库绑定</td></tr>
+                        <tr><td><code>DeepAgent</code></td><td>deep_agent/</td><td>深度推理</td><td>高级推理能力，专用提示词模板</td></tr>
+                        <tr><td><code>FinanceAgent</code></td><td>finance_agent/</td><td>金融分析</td><td>金融领域专属工具和提示词</td></tr>
+                    </tbody>
+                </table>
+                <h4>工具系统</h4>
+                <ul>
+                    <li><strong>内置工具</strong>：知识库查询、知识图谱查询、网页搜索（Tavily）、计算器等</li>
+                    <li><strong>MCP 工具</strong>：通过 langchain-mcp-adapters 接入外部 MCP 服务</li>
+                    <li><strong>MySQL 工具包</strong>：安全的 SQL 执行能力（含注入防护）</li>
+                    <li><strong>子智能体</strong>：calc_agent 计算器子智能体</li>
+                </ul>
+                <h4>对话流程</h4>
+                <div class="ascii-block"><pre>用户消息 → ContentGuard 审核 → Agent.stream_messages()
+  → LangGraph 状态机执行
+    → LLM 推理
+    → 工具调用（如需要）→ 人工审批中断（如配置）
+    → 生成回复
+  → SSE 流式推送（JSON 编码的 chunk）
+  → ConversationManager 持久化</pre></div>
+
+                <!-- 5.5 -->
+                <h3 id="sec-5-5">5.5 知识库系统</h3>
+                <p>采用 <strong>工厂模式 + 管理器模式</strong>，支持多种后端实现的统一管理。</p>
+                <div class="ascii-block"><pre>KnowledgeBaseManager（统一管理器）
+├── KnowledgeBaseFactory（工厂，注册/创建实例）
+│   ├── MilvusKB      — Milvus 向量检索
+│   └── LightRagKB    — LightRAG 图增强检索
+├── global_databases_meta（全局元数据）
+└── async metadata lock（线程安全锁）</pre></div>
+                <h4>文件状态生命周期</h4>
+                <div class="ascii-block"><pre>UPLOADED → PARSING → PARSED → INDEXING → INDEXED
+                              ↘ ERROR_PARSING    ↘ ERROR_INDEXING</pre></div>
+                <h4>两种实现</h4>
+                <table class="doc-table">
+                    <thead><tr><th>实现</th><th>后端</th><th>特点</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>MilvusKB</code></td><td>Milvus</td><td>Collection per KB，Embedding 模型配置，chunk size/overlap 可调</td></tr>
+                        <tr><td><code>LightRagKB</code></td><td>LightRAG + Neo4j</td><td>图增强检索，结合知识图谱结构化信息</td></tr>
+                    </tbody>
+                </table>
+                <h4>文档处理管线</h4>
+                <div class="ascii-block"><pre>文件上传 → MinIO 存储 → 文档解析（OCR/文本提取）→ 分块（RAGFlow 风格）→ 向量化 → 入库</pre></div>
+
+                <!-- 5.6 -->
+                <h3 id="sec-5-6">5.6 知识图谱系统</h3>
+                <p>通过适配器模式统一不同图数据库后端的访问接口。</p>
+                <div class="ascii-block"><pre>GraphAdapterFactory
+├── UploadGraphAdapter    — Neo4j 直接上传型（JSONL 实体导入）
+└── LightRAGGraphAdapter  — LightRAG 生成型（文档自动抽取实体/关系）
+    └── BaseNeo4jAdapter  — Neo4j 底层操作（Cypher 查询构建）</pre></div>
+
+                <!-- 5.7 -->
+                <h3 id="sec-5-7">5.7 对话管理</h3>
+                <p><code>ConversationManager</code> 负责对话的完整生命周期管理。</p>
+                <ul>
+                    <li>每个对话对应一个 <code>thread_id</code>（UUID），绑定用户和智能体</li>
+                    <li>支持软删除（status: active/archived/deleted）</li>
+                    <li>消息类型：<code>text</code> / <code>tool_call</code> / <code>tool_result</code></li>
+                    <li>支持多模态消息（image_content 存储 base64 图片）</li>
+                </ul>
+
+                <!-- 5.8 -->
+                <h3 id="sec-5-8">5.8 任务系统</h3>
+                <p><code>Tasker</code> 提供异步任务队列能力，用于处理耗时操作。</p>
+                <table class="doc-table">
+                    <thead><tr><th>场景</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td>文档解析</td><td>大文件 OCR 解析，可能耗时数分钟</td></tr>
+                        <tr><td>知识库索引</td><td>批量文档向量化和入库</td></tr>
+                        <tr><td>RAG 评测</td><td>基准数据集评测，涉及大量 LLM 调用</td></tr>
+                        <tr><td>基准生成</td><td>自动生成评测基准数据集</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- 5.9 -->
+                <h3 id="sec-5-9">5.9 评测系统</h3>
+                <div class="ascii-block"><pre>上传/生成基准数据集（JSONL）→ 执行评测 → 计算指标 → 查看结果</pre></div>
+                <p>基准格式：<code>{"query": "问题", "gold_chunk_ids": ["chunk_1"], "gold_answers": ["标准答案"]}</code></p>
+
+                <!-- 5.10 -->
+                <h3 id="sec-5-10">5.10 内容审核</h3>
+                <p><code>ContentGuard</code> 提供双模式内容安全审核：</p>
+                <div class="ascii-block"><pre>用户输入 → 关键词检查（始终执行）→ LLM 审核（可选）→ 通过 / 拦截</pre></div>
+
+                <!-- 5.11 -->
+                <h3 id="sec-5-11">5.11 文档处理插件</h3>
+                <table class="doc-table">
+                    <thead><tr><th>处理器</th><th>需要 GPU</th><th>部署方式</th><th>适用场景</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>onnx_rapid_ocr</code></td><td>否</td><td>本地</td><td>轻量 OCR，CPU 即可</td></tr>
+                        <tr><td><code>mineru_ocr</code></td><td>是</td><td>Docker</td><td>高质量文档解析</td></tr>
+                        <tr><td><code>paddlex_ocr</code></td><td>是</td><td>Docker</td><td>PP-StructureV3 版面分析</td></tr>
+                        <tr><td><code>deepseek_ocr</code></td><td>否</td><td>API</td><td>通过 SiliconFlow 调用</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- 5.12 -->
+                <h3 id="sec-5-12">5.12 模型管理</h3>
+                <ul>
+                    <li><strong>对话模型</strong>：通过 <code>select_model()</code> 选择，支持 OpenAI/DeepSeek/DashScope/SiliconFlow/自定义 Provider</li>
+                    <li><strong>Embedding</strong>：默认 BAAI/bge-m3，支持本地和 API 模型</li>
+                    <li><strong>Reranker</strong>：默认 BAAI/bge-reranker-v2-m3，通过 <code>enable_reranker</code> 开关控制</li>
+                </ul>
+
+                <!-- 5.13 -->
+                <h3 id="sec-5-13">5.13 配置系统</h3>
+                <p>配置优先级：<strong>环境变量 &gt; TOML 文件 &gt; 代码默认值</strong></p>
+                <div class="code-wrap"><span class="lang-tag">python</span><pre><code class="language-python">class Config(BaseModel):
+    save_dir: str                    # 持久化目录
+    default_model: str               # 默认对话模型
+    fast_model: str                  # 快速模型
+    embed_model: str                 # Embedding 模型
+    reranker: str                    # Reranker 模型
+    enable_reranker: bool            # 是否启用 Reranker
+    enable_content_guard: bool       # 是否启用内容审核
+    enable_web_search: bool          # 是否启用网页搜索</code></pre></div>
+            </div>
+
+            <!-- Section 6: API -->
+            <div class="doc-card sec-6" id="sec-6" data-section>
+                <h2>6. API 接口文档</h2>
+<h3>6.1 认证模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/auth/token</code></td><td>登录（user_id 或 phone_number）</td><td>公开（限流）</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/auth/check-first-run</code></td><td>检查是否首次运行</td><td>公开</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/auth/initialize</code></td><td>初始化管理员账户</td><td>公开（仅首次）</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/auth/register</code></td><td>用户注册</td><td>公开</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/auth/me</code></td><td>获取当前用户信息</td><td>登录</td></tr>
+<tr><td><span class="badge badge-orange">PUT</span></td><td><code>/api/auth/profile</code></td><td>更新个人资料</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/auth/users</code></td><td>创建用户</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/auth/users</code></td><td>用户列表（分页）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/auth/users/{user_id}</code></td><td>获取指定用户</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-orange">PUT</span></td><td><code>/api/auth/users/{user_id}</code></td><td>更新用户</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-red">DELETE</span></td><td><code>/api/auth/users/{user_id}</code></td><td>删除用户（软删除）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/auth/upload-avatar</code></td><td>上传头像到 MinIO</td><td>登录</td></tr>
+</tbody></table>
+<h3>6.2 对话模块 — 智能体管理</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/default_agent</code></td><td>获取默认智能体 ID</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/set_default_agent</code></td><td>设置默认智能体</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/agent</code></td><td>列出所有可用智能体</td><td>登录</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/agent/{agent_id}</code></td><td>获取智能体详情（含配置项）</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/agent/{agent_id}</code></td><td>流式对话（SSE，支持多模态）</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/agent/{agent_id}/resume</code></td><td>恢复中断的对话</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/agent/{agent_id}/config</code></td><td>保存智能体配置</td><td>登录</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/agent/{agent_id}/config</code></td><td>加载智能体配置</td><td>登录</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/agent/{agent_id}/history</code></td><td>获取对话历史（含反馈）</td><td>登录</td></tr>
+</tbody></table>
+<h3>6.2 对话模块 — 线程与附件</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/thread</code></td><td>创建新会话线程</td><td>登录</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/threads</code></td><td>列出用户的线程</td><td>登录</td></tr>
+<tr><td><span class="badge badge-red">DELETE</span></td><td><code>/api/chat/thread/{thread_id}</code></td><td>删除线程（软删除）</td><td>登录</td></tr>
+<tr><td><span class="badge badge-orange">PUT</span></td><td><code>/api/chat/thread/{thread_id}</code></td><td>更新线程标题</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/thread/{tid}/attachments</code></td><td>上传文件附件</td><td>登录</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/chat/thread/{tid}/attachments</code></td><td>列出附件</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/message/{mid}/feedback</code></td><td>提交反馈（like/dislike）</td><td>登录</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/chat/image/upload</code></td><td>上传并处理图片</td><td>登录</td></tr>
+</tbody></table>
+<h3>6.3 知识库模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/knowledge/databases</code></td><td>列出所有知识库</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/knowledge/databases</code></td><td>创建知识库</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/knowledge/databases/{db_id}</code></td><td>获取知识库详情</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-orange">PUT</span></td><td><code>/api/knowledge/databases/{db_id}</code></td><td>更新知识库信息</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-red">DELETE</span></td><td><code>/api/knowledge/databases/{db_id}</code></td><td>删除知识库</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/knowledge/databases/{db_id}/export</code></td><td>导出（csv/xlsx/md/txt）</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.4 知识图谱模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/graph/list</code></td><td>列出所有知识图谱</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/graph/subgraph</code></td><td>子图查询</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/graph/labels</code></td><td>获取所有图谱标签</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/graph/stats</code></td><td>图谱统计信息</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/graph/neo4j/index-entities</code></td><td>为节点添加向量索引</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/graph/neo4j/add-entities</code></td><td>批量导入实体（JSONL）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/graph/neo4j/delete-entities</code></td><td>删除实体</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.5 评测模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/evaluation/databases/{db_id}/benchmarks</code></td><td>列出基准数据集</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/evaluation/databases/{db_id}/benchmarks/upload</code></td><td>上传基准（JSONL）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/evaluation/databases/{db_id}/benchmarks/generate</code></td><td>自动生成基准</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/evaluation/databases/{db_id}/run</code></td><td>执行 RAG 评测</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/evaluation/databases/{db_id}/results/{task_id}</code></td><td>评测结果（分页）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/evaluation/databases/{db_id}/history</code></td><td>评测历史</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.6 思维导图</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/mindmap/generate</code></td><td>AI 生成思维导图</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/mindmap/database/{db_id}</code></td><td>获取已保存的思维导图</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/mindmap/databases</code></td><td>列出所有知识库</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.7 数据看板</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/conversations</code></td><td>会话列表（分页）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/conversations/{thread_id}</code></td><td>会话详情</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats</code></td><td>基础统计</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats/users</code></td><td>用户活跃度</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats/tools</code></td><td>工具调用统计</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats/knowledge</code></td><td>知识库统计</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats/agents</code></td><td>智能体分析</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/stats/calls/timeseries</code></td><td>时序数据</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/dashboard/feedbacks</code></td><td>反馈列表</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.8 任务模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/tasks/</code></td><td>任务列表（分页，可按状态过滤）</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/tasks/{task_id}</code></td><td>任务详情</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/tasks/{task_id}/cancel</code></td><td>取消任务</td><td>管理员</td></tr>
+</tbody></table>
+<h3>6.9 系统模块</h3>
+<table class="doc-table"><thead><tr><th>方法</th><th>路径</th><th>说明</th><th>权限</th></tr></thead><tbody>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/health</code></td><td>健康检查</td><td>公开</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/config</code></td><td>获取系统配置</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/system/config</code></td><td>更新单项配置</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/system/config/update</code></td><td>批量更新配置</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/logs</code></td><td>获取系统日志</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/ocr/stats</code></td><td>OCR 使用统计</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/ocr/health</code></td><td>OCR 服务健康检查</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/chat-models/all/status</code></td><td>检查所有模型状态</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-green">GET</span></td><td><code>/api/system/custom-providers</code></td><td>列出自定义 Provider</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/system/custom-providers</code></td><td>添加自定义 Provider</td><td>管理员</td></tr>
+<tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/system/custom-providers/{id}/test</code></td><td>测试 Provider 连接</td><td>管理员</td></tr>
+</tbody></table>
+            </div>
+
+            <!-- Section 7: Frontend -->
+            <div class="doc-card sec-7" id="sec-7" data-section>
+                <h2>7. 前端架构详解</h2>
+                <p>前端项目 <code>jinxizhice-web</code>（v0.4.2.web），基于 Vue 3 Composition API 构建。</p>
+                <h3>7.1 技术架构</h3>
+                <div class="ascii-block"><pre>Vue 3 SPA
+├── Vite 7.1.5          — 构建工具
+├── Pinia 3.0.3         — 状态管理（含持久化插件）
+├── Vue Router 4.5.1    — 路由管理
+├── Ant Design Vue 4.2.6 — UI 组件库
+└── 可视化库
+    ├── ECharts 6.0     — 图表
+    ├── AntV G6 5.0     — 图可视化
+    ├── Sigma 3.0       — 图渲染
+    └── Markmap         — 思维导图</pre></div>
+                <h3>7.2 API 服务层</h3>
+                <table class="doc-table">
+                    <thead><tr><th>模块</th><th>导出对象</th><th>职责</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>base.js</code></td><td>apiRequest/apiGet/apiPost...</td><td>基础请求封装，统一鉴权和错误处理</td></tr>
+                        <tr><td><code>agent_api.js</code></td><td>agentApi / threadApi</td><td>智能体对话、线程管理</td></tr>
+                        <tr><td><code>knowledge_api.js</code></td><td>databaseApi / documentApi</td><td>知识库 CRUD、文档管理</td></tr>
+                        <tr><td><code>graph_api.js</code></td><td>graphApi</td><td>知识图谱操作</td></tr>
+                        <tr><td><code>dashboard_api.js</code></td><td>dashboardApi</td><td>看板统计数据</td></tr>
+                        <tr><td><code>system_api.js</code></td><td>systemApi</td><td>系统配置与信息</td></tr>
+                        <tr><td><code>mindmap_api.js</code></td><td>mindmapApi</td><td>思维导图操作</td></tr>
+                    </tbody>
+                </table>
+                <h3>7.3 状态管理（Pinia Stores）</h3>
+                <table class="doc-table">
+                    <thead><tr><th>Store</th><th>职责</th><th>持久化</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>useUserStore</code></td><td>认证、Token、用户 CRUD、角色管理</td><td>localStorage</td></tr>
+                        <tr><td><code>useAgentStore</code></td><td>智能体列表、选中状态、配置项</td><td>localStorage</td></tr>
+                        <tr><td><code>useChatUIStore</code></td><td>侧边栏、加载状态、弹窗可见性</td><td>否</td></tr>
+                        <tr><td><code>useThemeStore</code></td><td>明暗主题切换（主色 #ff7e00）</td><td>localStorage</td></tr>
+                        <tr><td><code>useConfigStore</code></td><td>系统配置 CRUD</td><td>否</td></tr>
+                        <tr><td><code>useDatabaseStore</code></td><td>知识库状态</td><td>否</td></tr>
+                        <tr><td><code>useGraphStore</code></td><td>图可视化状态</td><td>否</td></tr>
+                        <tr><td><code>useTaskerStore</code></td><td>任务管理状态</td><td>否</td></tr>
+                        <tr><td><code>useInfoStore</code></td><td>系统信息/元数据</td><td>否</td></tr>
+                    </tbody>
+                </table>
+                <h3>7.4 路由与页面</h3>
+                <table class="doc-table">
+                    <thead><tr><th>路由</th><th>页面组件</th><th>权限</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>/</code></td><td>HomeView</td><td>公开</td></tr>
+                        <tr><td><code>/login</code></td><td>LoginView</td><td>公开</td></tr>
+                        <tr><td><code>/register</code></td><td>RegisterView</td><td>公开</td></tr>
+                        <tr><td><code>/agent</code></td><td>AgentView</td><td>管理员</td></tr>
+                        <tr><td><code>/agent/:agent_id</code></td><td>AgentSingleView</td><td>登录</td></tr>
+                        <tr><td><code>/graph</code></td><td>GraphView</td><td>管理员</td></tr>
+                        <tr><td><code>/database</code></td><td>DataBaseView</td><td>管理员</td></tr>
+                        <tr><td><code>/database/:id</code></td><td>DataBaseInfoView</td><td>管理员</td></tr>
+                        <tr><td><code>/dashboard</code></td><td>DashboardView</td><td>管理员</td></tr>
+                    </tbody>
+                </table>
+                <h3>7.5 组件体系（61 个组件）</h3>
+                <h4>对话相关</h4>
+                <p><code>AgentChatComponent</code> &middot; <code>AgentMessageComponent</code> &middot; <code>AgentInputArea</code> &middot; <code>AgentConfigSidebar</code> &middot; <code>ChatSidebarComponent</code> &middot; <code>AttachmentInputPanel</code> &middot; <code>HumanApprovalModal</code></p>
+                <h4>工具结果渲染器（9 个）</h4>
+                <p><code>BaseToolCall</code> &middot; <code>CalculatorTool</code> &middot; <code>ImageTool</code> &middot; <code>KnowledgeBaseTool</code> &middot; <code>KnowledgeGraphTool</code> &middot; <code>WebSearchTool</code> &middot; <code>TaskTool</code> &middot; <code>TodoListTool</code> &middot; <code>WriteFileTool</code></p>
+                <h4>看板组件（7 个）</h4>
+                <p><code>StatsOverviewComponent</code> &middot; <code>AgentStatsComponent</code> &middot; <code>CallStatsComponent</code> &middot; <code>UserStatsComponent</code> &middot; <code>KnowledgeStatsComponent</code> &middot; <code>ToolStatsComponent</code> &middot; <code>FeedbackModalComponent</code></p>
+                <h3>7.6 组合式函数</h3>
+                <table class="doc-table">
+                    <thead><tr><th>函数</th><th>职责</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>useAgentStreamHandler</code></td><td>SSE 流式消息处理，解析 JSON chunk</td></tr>
+                        <tr><td><code>useApproval</code></td><td>人工审批工作流</td></tr>
+                        <tr><td><code>useGraph</code></td><td>图可视化逻辑，管理 Sigma/G6 实例</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 8: Data Model -->
+            <div class="doc-card sec-8" id="sec-8" data-section>
+                <h2>8. 数据模型</h2>
+                <p>SQLAlchemy ORM，存储在 SQLite（<code>saves/database/server.db</code>）。</p>
+                <h3>ER 关系</h3>
+                <div class="ascii-block"><pre>users ──1:N──&gt; operation_logs
+conversations ──1:N──&gt; messages ──1:N──&gt; tool_calls
+conversations ──1:1──&gt; conversation_stats
+messages ──1:N──&gt; message_feedbacks</pre></div>
+                <h3>表结构</h3>
+                <h4>users（用户表）</h4>
+                <table class="doc-table">
+                    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>Integer PK</td><td>自增主键</td></tr>
+                        <tr><td><code>username</code></td><td>String UNIQUE</td><td>显示名称（2-20 字符）</td></tr>
+                        <tr><td><code>user_id</code></td><td>String UNIQUE</td><td>登录 ID</td></tr>
+                        <tr><td><code>phone_number</code></td><td>String UNIQUE</td><td>手机号（可选）</td></tr>
+                        <tr><td><code>password_hash</code></td><td>String</td><td>密码哈希</td></tr>
+                        <tr><td><code>role</code></td><td>String</td><td>superadmin / admin / user</td></tr>
+                        <tr><td><code>login_failed_count</code></td><td>Integer</td><td>连续失败次数</td></tr>
+                        <tr><td><code>login_locked_until</code></td><td>DateTime</td><td>锁定截止时间</td></tr>
+                        <tr><td><code>is_deleted</code></td><td>Integer</td><td>软删除标记（0/1）</td></tr>
+                    </tbody>
+                </table>
+                <h4>conversations（会话表）</h4>
+                <table class="doc-table">
+                    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>thread_id</code></td><td>String(64) UNIQUE</td><td>线程 ID（UUID）</td></tr>
+                        <tr><td><code>user_id</code></td><td>String(64)</td><td>用户 ID</td></tr>
+                        <tr><td><code>agent_id</code></td><td>String(64)</td><td>智能体 ID</td></tr>
+                        <tr><td><code>title</code></td><td>String(255)</td><td>会话标题</td></tr>
+                        <tr><td><code>status</code></td><td>String(20)</td><td>active / archived / deleted</td></tr>
+                    </tbody>
+                </table>
+                <h4>messages（消息表）</h4>
+                <table class="doc-table">
+                    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>role</code></td><td>String(20)</td><td>user / assistant / system / tool</td></tr>
+                        <tr><td><code>content</code></td><td>Text</td><td>消息内容</td></tr>
+                        <tr><td><code>message_type</code></td><td>String(30)</td><td>text / tool_call / tool_result</td></tr>
+                        <tr><td><code>image_content</code></td><td>Text</td><td>Base64 图片（多模态）</td></tr>
+                    </tbody>
+                </table>
+                <h4>tool_calls（工具调用表）</h4>
+                <table class="doc-table">
+                    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>tool_name</code></td><td>String(100)</td><td>工具名称</td></tr>
+                        <tr><td><code>tool_input</code></td><td>JSON</td><td>输入参数</td></tr>
+                        <tr><td><code>tool_output</code></td><td>Text</td><td>执行结果</td></tr>
+                        <tr><td><code>status</code></td><td>String(20)</td><td>pending / success / error</td></tr>
+                    </tbody>
+                </table>
+                <h4>message_feedbacks / conversation_stats / operation_logs</h4>
+                <ul>
+                    <li><strong>message_feedbacks</strong>：消息反馈（rating: like/dislike + reason）</li>
+                    <li><strong>conversation_stats</strong>：会话统计（message_count, total_tokens, model_used）</li>
+                    <li><strong>operation_logs</strong>：操作审计（operation, details, ip_address）</li>
+                </ul>
+                <p>所有时间字段统一 UTC 存储，通过 <code>utc_now()</code> 生成，<code>utc_isoformat()</code> 格式化输出。</p>
+            </div>
+
+            <!-- Section 9: Storage -->
+            <div class="doc-card sec-9" id="sec-9" data-section>
+                <h2>9. 存储层架构</h2>
+                <table class="doc-table">
+                    <thead><tr><th>存储引擎</th><th>用途</th><th>数据类型</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>SQLite</strong></td><td>关系型数据</td><td>用户、会话、消息、工具调用、反馈、操作日志</td></tr>
+                        <tr><td><strong>Milvus</strong></td><td>向量检索</td><td>知识库文档 Embedding 向量，每个 KB 一个 Collection</td></tr>
+                        <tr><td><strong>Neo4j</strong></td><td>图数据</td><td>知识图谱的实体和关系</td></tr>
+                        <tr><td><strong>MinIO</strong></td><td>对象存储</td><td>上传文件、用户头像、知识库原始文档</td></tr>
+                        <tr><td><strong>文件系统</strong></td><td>配置与状态</td><td>TOML 配置、JSON 元数据、智能体状态、任务数据、日志</td></tr>
+                    </tbody>
+                </table>
+                <h3>文件系统存储结构</h3>
+                <div class="ascii-block"><pre>saves/
+├── config/base.toml              # 系统配置
+├── agents/{agent_name}/
+│   ├── config.yaml               # 智能体运行时配置
+│   ├── metadata.toml             # 智能体元信息
+│   └── checkpoints.db            # LangGraph 检查点
+├── knowledge_base_data/
+│   ├── databases_meta.json       # 知识库全局元数据
+│   └── {kb_type}/{db_id}/        # 各知识库数据目录
+├── tasks/                        # 异步任务状态
+└── logs/                         # 应用日志文件</pre></div>
+                <p>元数据文件采用原子写入策略：先写临时文件，再重命名覆盖，确保断电安全。</p>
+            </div>
+
+            <!-- Section 10: Deployment -->
+            <div class="doc-card sec-10" id="sec-10" data-section>
+                <h2>10. 部署与运维</h2>
+                <h3>Docker Compose 服务</h3>
+                <table class="doc-table">
+                    <thead><tr><th>服务</th><th>镜像</th><th>端口</th><th>依赖</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>api</strong></td><td>jinxizhice-api:0.4.dev</td><td>5050</td><td>milvus, minio</td></tr>
+                        <tr><td><strong>web</strong></td><td>jinxizhice-web:0.4.dev</td><td>5173</td><td>api</td></tr>
+                        <tr><td><strong>graph</strong></td><td>neo4j:5.26</td><td>7474, 7687</td><td>-</td></tr>
+                        <tr><td><strong>milvus</strong></td><td>milvusdb/milvus:v2.5.6</td><td>19530</td><td>etcd, minio</td></tr>
+                        <tr><td><strong>etcd</strong></td><td>coreos/etcd:v3.5.5</td><td>2379</td><td>-</td></tr>
+                        <tr><td><strong>minio</strong></td><td>minio/minio</td><td>9000, 9001</td><td>-</td></tr>
+                        <tr><td><strong>mineru</strong> (可选)</td><td>mineru-vllm:latest</td><td>30000</td><td>NVIDIA GPU</td></tr>
+                        <tr><td><strong>paddlex</strong> (可选)</td><td>paddlex:latest</td><td>8080</td><td>NVIDIA GPU</td></tr>
+                    </tbody>
+                </table>
+                <h3>健康检查</h3>
+                <table class="doc-table">
+                    <thead><tr><th>服务</th><th>检查方式</th><th>间隔</th><th>启动等待</th></tr></thead>
+                    <tbody>
+                        <tr><td>api</td><td>curl /api/system/health</td><td>30s</td><td>180s</td></tr>
+                        <tr><td>graph</td><td>curl :7474</td><td>20s</td><td>30s</td></tr>
+                        <tr><td>milvus</td><td>curl :9091/healthz</td><td>60s</td><td>120s</td></tr>
+                        <tr><td>minio</td><td>curl :9000/minio/health/live</td><td>60s</td><td>30s</td></tr>
+                    </tbody>
+                </table>
+                <h3>启动命令</h3>
+                <div class="code-wrap"><span class="lang-tag">bash</span><pre><code class="language-bash"># 启动核心服务
+docker compose up -d
+
+# 启动全部服务（含 GPU 文档解析）
+docker compose --profile all up -d
+
+# 仅后端开发（本地运行）
+uv run --no-dev uvicorn server.main:app --host 0.0.0.0 --port 5050 --reload
+
+# 仅前端开发（本地运行）
+cd frontend &amp;&amp; pnpm run dev</code></pre></div>
+                <h3>关键环境变量</h3>
+                <table class="doc-table">
+                    <thead><tr><th>变量</th><th>默认值</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>NEO4J_URI</code></td><td>bolt://graph:7687</td><td>Neo4j 连接地址</td></tr>
+                        <tr><td><code>MILVUS_URI</code></td><td>http://milvus:19530</td><td>Milvus 连接地址</td></tr>
+                        <tr><td><code>MINIO_URI</code></td><td>http://milvus-minio:9000</td><td>MinIO 地址</td></tr>
+                        <tr><td><code>MINIO_ACCESS_KEY</code></td><td>minioadmin</td><td>MinIO 访问密钥</td></tr>
+                        <tr><td><code>MINERU_OCR_URI</code></td><td>http://mineru:30000</td><td>MinerU OCR 地址</td></tr>
+                        <tr><td><code>PADDLEX_URI</code></td><td>http://paddlex:8080</td><td>PaddleX 地址</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 11: Design Patterns -->
+            <div class="doc-card sec-11" id="sec-11" data-section>
+                <h2>11. 设计模式总结</h2>
+                <table class="doc-table">
+                    <thead><tr><th>设计模式</th><th>应用位置</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>单例</strong></td><td>AgentManager, DBManager, Config, ContentGuard</td><td>全局唯一实例</td></tr>
+                        <tr><td><strong>工厂</strong></td><td>KnowledgeBaseFactory, GraphAdapterFactory, DocumentProcessorFactory</td><td>根据类型创建实例</td></tr>
+                        <tr><td><strong>模板方法</strong></td><td>BaseAgent, KnowledgeBase, BaseDocumentProcessor</td><td>定义算法骨架，子类实现</td></tr>
+                        <tr><td><strong>策略</strong></td><td>上下文模型选择、提示词生成、KB 实现切换</td><td>运行时动态选择算法</td></tr>
+                        <tr><td><strong>适配器</strong></td><td>GraphAdapter（统一 Neo4j/LightRAG 接口）</td><td>统一不同后端接口</td></tr>
+                        <tr><td><strong>装饰器</strong></td><td>DynamicToolMiddleware, AttachmentMiddleware</td><td>透明增强智能体能力</td></tr>
+                        <tr><td><strong>仓储</strong></td><td>ConversationManager, DBManager</td><td>封装数据访问逻辑</td></tr>
+                        <tr><td><strong>门面</strong></td><td>KnowledgeBaseManager</td><td>为复杂子系统提供统一接口</td></tr>
+                        <tr><td><strong>责任链</strong></td><td>ContentGuard（关键词 → LLM 审核）</td><td>请求沿链传递</td></tr>
+                        <tr><td><strong>观察者</strong></td><td>SSE 流式推送</td><td>事件驱动的消息推送</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align:center;padding:2rem 0 1rem;color:#475569;font-size:0.75rem;">
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <!-- Back to top -->
+    <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+
+    <script>
+        // Highlight.js init
+        hljs.highlightAll();
+
+        // Sidebar toggle (mobile)
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        // Nav group toggle
+        function toggleNavGroup(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.toggle('open');
+        }
+
+        // Scroll spy: highlight current section in sidebar
+        var navItems = document.querySelectorAll('.nav-item[href]');
+        var sections = document.querySelectorAll('[data-section]');
+
+        function updateActiveNav() {
+            var scrollPos = window.scrollY + 120;
+            var current = '';
+            sections.forEach(function(sec) {
+                if (sec.offsetTop <= scrollPos) {
+                    current = sec.id;
+                }
+            });
+            navItems.forEach(function(item) {
+                var href = item.getAttribute('href');
+                if (href === '#' + current) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            // Also check sub-sections (h3 with id)
+            var subSections = document.querySelectorAll('h3[id]');
+            subSections.forEach(function(h3) {
+                if (h3.offsetTop <= scrollPos) {
+                    current = h3.id;
+                }
+            });
+            document.querySelectorAll('.nav-sub .nav-item[href]').forEach(function(item) {
+                var href = item.getAttribute('href');
+                if (href === '#' + current) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Back to top button
+        function updateBackTop() {
+            var btn = document.getElementById('backTop');
+            if (window.scrollY > 400) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
+            }
+        }
+
+        // Throttled scroll handler
+        var scrollTimer = null;
+        window.addEventListener('scroll', function() {
+            if (scrollTimer) return;
+            scrollTimer = setTimeout(function() {
+                updateActiveNav();
+                updateBackTop();
+                scrollTimer = null;
+            }, 80);
+        });
+
+        // Smooth scroll for nav links
+        navItems.forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                var href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    var target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Close mobile sidebar
+                        document.getElementById('sidebar').classList.remove('open');
+                        document.getElementById('overlay').classList.remove('show');
+                    }
+                }
+            });
+        });
+        // Same for sub nav
+        document.querySelectorAll('.nav-sub .nav-item[href]').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                var href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    var target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        document.getElementById('sidebar').classList.remove('open');
+                        document.getElementById('overlay').classList.remove('show');
+                    }
+                }
+            });
+        });
+
+        // Search
+        function handleSearch(query) {
+            var cards = document.querySelectorAll('[data-section]');
+            query = query.trim().toLowerCase();
+            if (!query) {
+                cards.forEach(function(c) { c.classList.remove('hidden'); });
+                // Remove highlights
+                document.querySelectorAll('mark').forEach(function(m) {
+                    m.outerHTML = m.textContent;
+                });
+                return;
+            }
+            cards.forEach(function(card) {
+                var text = card.textContent.toLowerCase();
+                if (text.indexOf(query) !== -1) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Copy button for code blocks
+        document.querySelectorAll('.code-wrap').forEach(function(wrap) {
+            var btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = '复制';
+            btn.addEventListener('click', function() {
+                var code = wrap.querySelector('code');
+                if (code) {
+                    navigator.clipboard.writeText(code.textContent).then(function() {
+                        btn.textContent = '已复制';
+                        setTimeout(function() { btn.textContent = '复制'; }, 1500);
+                    });
+                }
+            });
+            wrap.appendChild(btn);
+        });
+
+        // Init
+        updateActiveNav();
+    </script>
+</body>
+</html>

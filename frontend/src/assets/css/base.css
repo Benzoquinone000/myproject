@@ -1,0 +1,153 @@
+
+/* Hugging Face Orange Theme */
+:root {
+  font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --main-1000: #331400;
+  --main-900:  #4d1f00;
+  --main-800:  #662900;
+  --main-700:  #803300;
+  --main-600:  #994000;
+  --main-500:  #ff7e00;
+  --main-400:  #ff9933;
+  --main-300:  #ffb366;
+  --main-200:  #ffcc99;
+  --main-100:  #ffe5cc;
+  --main-50:   #fff2e6;
+  --main-40:   #fff5eb;
+  --main-30:   #fffaf5;
+  --main-20:   #fffbf7;
+  --main-10:   #fffdfa;
+  --main-5:    #fffefc;
+  --main-1:    #fffefe;
+  --main-0:    #ffffff;
+
+
+  --gray-10000: #000000; /* 保持纯黑 */
+  --gray-2000:  #0c0d0d; /* 更精致的暗灰，用于极深背景 */
+  --gray-1000:  #151616; /* 深灰黑，适用于主文本 */
+  --gray-900:   #1e1f1f;
+  --gray-800:   #323333; /* 标准深灰，适合背景 */
+  --gray-700:   #4c4d4d;
+  --gray-600:   #697070; /* 调和中灰，适合次要文本 */
+  --gray-500:   #979999; /* 更柔和的中灰色 */
+  --gray-400:   #bdbfbf;
+  --gray-300:   #d7d9d9; /* 修正了原300/200重复 */
+  --gray-200:   #e4e6e6; /* 稍微加深一点，便于分层 */
+  --gray-150:   #eef0f0;
+  --gray-100:   #eff2f2;
+  --gray-50:    #f5f7f7;
+  --gray-25:    #f8fafa;
+  --gray-10:    #fbfcfc;
+  --gray-0:     #ffffff;
+
+  /* Standard Color System - 标准5档色阶系统 */
+  --color-primary-50: #fff2e6;   /* 主色调-最浅 */
+  --color-primary-100: #ffe5cc;  /* 主色调-浅 */
+  --color-primary-500: #ff7e00;  /* 主色调-标准 */
+  --color-primary-700: #803300;  /* 主色调-深 */
+  --color-primary-900: #4d1f00;  /* 主色调-最深 */
+
+  /* 保留原有的 main 变量 */
+  --main-color: #cc5f00;
+  --main-bright: #ff7e00;
+
+  --color-secondary-50: #f5f7f7;   /* 次要色-最浅 */
+  --color-secondary-100: #eff2f2;  /* 次要色-浅 */
+  --color-secondary-500: #4e616d;  /* 次要色-标准 */
+  --color-secondary-700: #3a4a56;  /* 次要色-深 */
+  --color-secondary-900: #2c3843;  /* 次要色-最深 */
+
+  --color-success-50: #f6ffed;    /* 成功色-最浅 */
+  --color-success-100: #b7eb8f;   /* 成功色-浅 */
+  --color-success-500: #52c41a;   /* 成功色-标准 */
+  --color-success-700: #389e0d;   /* 成功色-深 */
+  --color-success-900: #135200;   /* 成功色-最深 */
+
+  --color-error-50: #fff2f0;      /* 错误色-最浅 */
+  --color-error-100: #ffccc7;     /* 错误色-浅 */
+  --color-error-500: #ff4d4f;     /* 错误色-标准 */
+  --color-error-700: #cf1322;     /* 错误色-深 */
+  --color-error-900: #820014;     /* 错误色-最深 */
+
+  --color-warning-50: #fffbe6;    /* 警告色-最浅 */
+  --color-warning-100: #ffe58f;   /* 警告色-浅 */
+  --color-warning-500: #faad14;   /* 警告色-标准 */
+  --color-warning-700: #d48806;   /* 警告色-深 */
+  --color-warning-900: #ad6800;   /* 警告色-最深 */
+
+  --color-info-50: #e6f7ff;       /* 信息色-最浅 */
+  --color-info-100: #bae7ff;      /* 信息色-浅 */
+  --color-info-500: #1890ff;      /* 信息色-标准 */
+  --color-info-700: #096dd9;      /* 信息色-深 */
+  --color-info-900: #0050b3;      /* 信息色-最深 */
+
+  --color-accent-50: #e6fffb;     /* 强调色-最浅 */
+  --color-accent-100: #87e8de;    /* 强调色-浅 */
+  --color-accent-500: #13c2c2;    /* 强调色-标准 */
+  --color-accent-700: #08979c;    /* 强调色-深 */
+  --color-accent-900: #006d75;    /* 强调色-最深 */
+
+  /* Chart Palette - 图表调色板 */
+  --chart-palette-1: var(--main-500);
+  --chart-palette-2: #5AD8A6;
+  --chart-palette-3: #F6BD16;
+  --chart-palette-4: #F27C7C;
+  --chart-palette-5: #9581CC;
+  --chart-palette-6: #6DC8EC;
+  --chart-palette-7: #FF9D4D;
+  --chart-palette-8: #92D050;
+  --chart-palette-9: #E885BA;
+  --chart-palette-10: #8C8C8C;
+
+  --bg-sider: var(--main-5);
+  --color-text: var(--c-black);
+
+  /* Shadow System - 阴影系统 */
+  --shadow-0: rgba(0, 0, 0, 0.02);
+  --shadow-1: rgba(0, 0, 0, 0.05);
+  --shadow-2: rgba(0, 0, 0, 0.08);
+  --shadow-3: rgba(0, 0, 0, 0.12);
+  --shadow-4: rgba(0, 0, 0, 0.16);
+  --shadow-5: rgba(0, 0, 0, 0.20);
+
+
+  --min-width: 400px;
+
+  /* Ant Design 兼容变量 */
+  --color-bg-container: var(--main-0);
+  --color-bg-elevated: var(--gray-10);
+  --color-text-secondary: rgba(0, 0, 0, 0.65);
+  --color-text-tertiary: rgba(0, 0, 0, 0.45);
+  --color-trans-light: rgba(255, 255, 255, 0.85);
+  --color-trans-dark: rgba(0, 0, 0, 0.85);
+}
+
+:root {
+  --scrollbar-width: 6px;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) transparent;
+}

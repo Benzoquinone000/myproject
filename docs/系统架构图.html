@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能决策系统架构图 - 金析智策</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --color-client: #3b82f6;
+            --color-gateway: #f97316;
+            --color-router: #a855f7;
+            --color-domain: #22c55e;
+            --color-data: #ef4444;
+            --color-external: #6b7280;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+        }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-dark); color: #e2e8f0; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+            background-size: 50px 50px; pointer-events: none; z-index: 0;
+        }
+        .bg-grid::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 70%);
+        }
+        .arch-card {
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            padding: 1.5rem; position: relative; overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .arch-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--card-color), transparent); opacity: 0; transition: opacity 0.3s;
+        }
+        .arch-card:hover {
+            transform: translateY(-4px); border-color: var(--card-color);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 30px -5px var(--card-color-glow);
+        }
+        .arch-card:hover::before { opacity: 1; }
+        .layer-client { --card-color: var(--color-client); --card-color-glow: rgba(59,130,246,0.3); }
+        .layer-gateway { --card-color: var(--color-gateway); --card-color-glow: rgba(249,115,22,0.3); }
+        .layer-router { --card-color: var(--color-router); --card-color-glow: rgba(168,85,247,0.3); }
+        .layer-domain { --card-color: var(--color-domain); --card-color-glow: rgba(34,197,94,0.3); }
+        .layer-data { --card-color: var(--color-data); --card-color-glow: rgba(239,68,68,0.3); }
+        .layer-external { --card-color: var(--color-external); --card-color-glow: rgba(107,114,128,0.3); }
+        .component-tag {
+            display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; font-size: 0.875rem; transition: all 0.2s;
+        }
+        .component-tag:hover { background: rgba(255,255,255,0.1); border-color: var(--card-color); }
+        .connection-line { stroke-dasharray: 8 4; animation: dash 20s linear infinite; }
+        @keyframes dash { to { stroke-dashoffset: -100; } }
+        .layer-title {
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--card-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .layer-title::before { content: ''; width: 8px; height: 8px; background: var(--card-color); border-radius: 2px; }
+        .detail-panel {
+            position: fixed; right: -400px; top: 0; width: 400px; height: 100vh;
+            background: rgba(15,23,42,0.98); backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.1); z-index: 1000;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 2rem;
+        }
+        .detail-panel.active { right: 0; }
+        .close-btn {
+            position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .close-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
+        .tech-badge {
+            display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+            background: rgba(59,130,246,0.2); color: #60a5fa; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 500; margin: 0.25rem;
+        }
+        @media (max-width: 768px) { .detail-panel { width: 100%; right: -100%; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <header class="relative z-10 pt-12 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent">
+                        金析智策系统架构
+                    </h1>
+                    <p class="text-gray-400 text-lg">JinXiZhiCe - 智能决策支持平台技术全景</p>
+                </div>
+                <div class="hidden md:flex gap-4">
+                    <div class="stat-card"><div class="stat-number mono">6</div><div class="text-xs text-gray-400 mt-1">架构层级</div></div>
+                    <div class="stat-card"><div class="stat-number mono">30+</div><div class="text-xs text-gray-400 mt-1">核心组件</div></div>
+                    <div class="stat-card"><div class="stat-number mono">5</div><div class="text-xs text-gray-400 mt-1">数据存储</div></div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-4 text-sm">
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-gray-400">客户端层</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span><span class="text-gray-400">接入层</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-500"></span><span class="text-gray-400">路由层</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span><span class="text-gray-400">领域服务</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span><span class="text-gray-400">数据存储</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gray-500"></span><span class="text-gray-400">外部服务</span></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pb-20 space-y-8">
+        <!-- Layer 1: Client -->
+        <section class="arch-card layer-client" data-layer="client">
+            <div class="layer-title">客户端层 Client Layer</div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-xl font-semibold mb-3 text-blue-400">Vue 3 SPA 应用</h3>
+                    <p class="text-gray-400 mb-4">jinxizhice-web - 现代化前端单页应用</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Vue 3.5</span><span class="tech-badge">Pinia</span>
+                        <span class="tech-badge">Vue Router</span><span class="tech-badge">Ant Design Vue</span>
+                        <span class="tech-badge">ECharts</span><span class="tech-badge">AntV G6</span>
+                        <span class="tech-badge">Sigma</span><span class="tech-badge">Markmap</span>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">agent_api</span></div>
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">knowledge_api</span></div>
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">graph_api</span></div>
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">dashboard_api</span></div>
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">system_api</span></div>
+                        <div class="component-tag text-xs"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span class="mono">mindmap_api</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="flex justify-center"><svg width="2" height="40" class="opacity-50"><line x1="1" y1="0" x2="1" y2="40" stroke="#3b82f6" stroke-width="2" class="connection-line"/></svg></div>
+
+        <!-- Layer 2: Gateway -->
+        <section class="arch-card layer-gateway" data-layer="gateway">
+            <div class="layer-title">接入层 Gateway Layer</div>
+            <div class="flex flex-wrap gap-4 mb-4">
+                <span class="tech-badge" style="background:rgba(249,115,22,0.2);color:#fb923c;">FastAPI</span>
+                <span class="tech-badge" style="background:rgba(249,115,22,0.2);color:#fb923c;">Uvicorn :5050</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="component-tag border-orange-500/30"><span class="text-orange-400 font-semibold">CORS</span><span class="text-xs text-gray-500">跨域中间件</span></div>
+                <div class="component-tag border-orange-500/30"><span class="text-orange-400 font-semibold">Auth</span><span class="text-xs text-gray-500">认证中间件</span></div>
+                <div class="component-tag border-orange-500/30"><span class="text-orange-400 font-semibold">RateLimit</span><span class="text-xs text-gray-500">10次/60s</span></div>
+                <div class="component-tag border-orange-500/30"><span class="text-orange-400 font-semibold">AccessLog</span><span class="text-xs text-gray-500">访问日志</span></div>
+            </div>
+        </section>
+        <div class="flex justify-center"><svg width="2" height="40" class="opacity-50"><line x1="1" y1="0" x2="1" y2="40" stroke="#f97316" stroke-width="2" class="connection-line"/></svg></div>
+
+        <!-- Layer 3: Router -->
+        <section class="arch-card layer-router" data-layer="router">
+            <div class="layer-title">路由层 Router Layer</div>
+            <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3">
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('auth')"><span class="text-purple-400 font-semibold">auth</span><span class="text-xs text-gray-500">登录</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('chat')"><span class="text-purple-400 font-semibold">chat</span><span class="text-xs text-gray-500">对话</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('kb')"><span class="text-purple-400 font-semibold">knowledge</span><span class="text-xs text-gray-500">知识库</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('graph')"><span class="text-purple-400 font-semibold">graph</span><span class="text-xs text-gray-500">图谱</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('eval')"><span class="text-purple-400 font-semibold">evaluation</span><span class="text-xs text-gray-500">评测</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('mind')"><span class="text-purple-400 font-semibold">mindmap</span><span class="text-xs text-gray-500">导图</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('dash')"><span class="text-purple-400 font-semibold">dashboard</span><span class="text-xs text-gray-500">统计</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('task')"><span class="text-purple-400 font-semibold">task</span><span class="text-xs text-gray-500">任务</span></div>
+                <div class="component-tag cursor-pointer hover:bg-purple-500/20" onclick="showDetail('system')"><span class="text-purple-400 font-semibold">system</span><span class="text-xs text-gray-500">系统</span></div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/10">
+                <div class="text-sm text-gray-400 mb-3">鉴权依赖注入</div>
+                <div class="flex flex-wrap gap-3">
+                    <div class="px-3 py-1 bg-white/5 rounded text-xs mono text-gray-300">PUBLIC_PATHS</div>
+                    <div class="px-3 py-1 bg-white/5 rounded text-xs mono text-blue-300">get_required_user (JWT)</div>
+                    <div class="px-3 py-1 bg-white/5 rounded text-xs mono text-red-300">get_admin_user</div>
+                </div>
+            </div>
+        </section>
+        <div class="flex justify-center"><svg width="2" height="40" class="opacity-50"><line x1="1" y1="0" x2="1" y2="40" stroke="#a855f7" stroke-width="2" class="connection-line"/></svg></div>
+
+        <!-- Layer 4: Domain -->
+        <section class="arch-card layer-domain" data-layer="domain">
+            <div class="layer-title">领域服务层 Domain Layer</div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                        <h4 class="font-semibold text-green-400">AgentManager</h4>
+                    </div>
+                    <div class="pl-4 border-l-2 border-green-500/30 space-y-2">
+                        <div class="component-tag text-xs"><span>BaseAgent (LangGraph)</span></div>
+                        <div class="component-tag text-xs"><span>ChatbotAgent</span></div>
+                        <div class="component-tag text-xs"><span>DeepAgent</span></div>
+                        <div class="component-tag text-xs"><span>FinanceAgent</span></div>
+                        <div class="component-tag text-xs"><span>Tools + MCP + SubAgents</span></div>
+                        <div class="component-tag text-xs"><span>Middleware (Context/Attachment/DynamicTools)</span></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 mono">自动发现 &middot; 单例 &middot; reload_all</div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <h4 class="font-semibold text-green-400">KnowledgeBaseManager</h4>
+                    </div>
+                    <div class="pl-4 border-l-2 border-green-500/30 space-y-2">
+                        <div class="component-tag text-xs border-green-500/30"><span class="text-green-400">MilvusKB</span><span class="text-gray-500">向量检索</span></div>
+                        <div class="component-tag text-xs border-green-500/30"><span class="text-green-400">LightRagKB</span><span class="text-gray-500">图增强</span></div>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mt-2">
+                        <span class="tech-badge" style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:0.65rem;">Docling</span>
+                        <span class="tech-badge" style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:0.65rem;">MinerU</span>
+                        <span class="tech-badge" style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:0.65rem;">PaddleX</span>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <h4 class="font-semibold text-green-400">支撑服务</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="component-tag text-xs justify-between"><span>ConversationManager</span></div>
+                        <div class="component-tag text-xs justify-between"><span>Tasker (异步队列)</span></div>
+                        <div class="component-tag text-xs justify-between"><span>GraphAdapterFactory</span></div>
+                        <div class="component-tag text-xs justify-between"><span>EvaluationService</span></div>
+                        <div class="component-tag text-xs justify-between"><span>Embedding / Reranker</span></div>
+                        <div class="component-tag text-xs justify-between"><span>Config (Pydantic + TOML)</span></div>
+                        <div class="component-tag text-xs justify-between border-yellow-500/30"><span class="text-yellow-400">ContentGuard</span><span class="text-xs text-gray-500">内容审核</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="flex justify-center"><svg width="2" height="40" class="opacity-50"><line x1="1" y1="0" x2="1" y2="40" stroke="#22c55e" stroke-width="2" class="connection-line"/></svg></div>
+
+        <!-- Layer 5: Data -->
+        <section class="arch-card layer-data" data-layer="data">
+            <div class="layer-title">数据与存储层 Data Layer</div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-all cursor-pointer">
+                    <div class="text-3xl mb-2">&#128451;</div>
+                    <div class="font-semibold text-red-400 mb-1">SQLite</div>
+                    <div class="text-xs text-gray-500 mono">server.db</div>
+                    <div class="text-xs text-gray-600 mt-2">用户&middot;会话&middot;消息&middot;日志</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-all cursor-pointer">
+                    <div class="text-3xl mb-2">&#128230;</div>
+                    <div class="font-semibold text-red-400 mb-1">MinIO</div>
+                    <div class="text-xs text-gray-500 mono">对象存储</div>
+                    <div class="text-xs text-gray-600 mt-2">文件&middot;头像&middot;文档</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-all cursor-pointer">
+                    <div class="text-3xl mb-2">&#128269;</div>
+                    <div class="font-semibold text-red-400 mb-1">Milvus</div>
+                    <div class="text-xs text-gray-500 mono">v2.5.6</div>
+                    <div class="text-xs text-gray-600 mt-2">向量索引 Collection</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-all cursor-pointer">
+                    <div class="text-3xl mb-2">&#128376;</div>
+                    <div class="font-semibold text-red-400 mb-1">Neo4j</div>
+                    <div class="text-xs text-gray-500 mono">5.26</div>
+                    <div class="text-xs text-gray-600 mt-2">知识图谱 实体&middot;关系</div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-4 text-center hover:bg-white/10 transition-all cursor-pointer">
+                    <div class="text-3xl mb-2">&#128193;</div>
+                    <div class="font-semibold text-red-400 mb-1">Saves</div>
+                    <div class="text-xs text-gray-500 mono">本地目录</div>
+                    <div class="text-xs text-gray-600 mt-2">配置&middot;代理&middot;任务</div>
+                </div>
+            </div>
+        </section>
+        <div class="flex justify-center"><svg width="2" height="40" class="opacity-50"><line x1="1" y1="0" x2="1" y2="40" stroke="#ef4444" stroke-width="2" class="connection-line"/></svg></div>
+
+        <!-- Layer 6: External -->
+        <section class="arch-card layer-external" data-layer="external">
+            <div class="layer-title">外部服务 External Services</div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="component-tag flex-col items-start h-auto py-3"><span class="font-semibold text-gray-300">LLM API</span><span class="text-xs text-gray-500 mt-1">SiliconFlow &middot; OpenAI<br>DeepSeek &middot; DashScope</span></div>
+                <div class="component-tag flex-col items-start h-auto py-3"><span class="font-semibold text-gray-300">Embedding</span><span class="text-xs text-gray-500 mt-1">BGE-M3 等模型</span></div>
+                <div class="component-tag flex-col items-start h-auto py-3"><span class="font-semibold text-gray-300">Tavily</span><span class="text-xs text-gray-500 mt-1">网页搜索 (可选)</span></div>
+                <div class="component-tag flex-col items-start h-auto py-3"><span class="font-semibold text-gray-300">MCP 服务</span><span class="text-xs text-gray-500 mt-1">外部工具协议</span></div>
+                <div class="component-tag flex-col items-start h-auto py-3 border-dashed border-gray-600"><span class="font-semibold text-gray-400">GPU 解析</span><span class="text-xs text-gray-500 mt-1">MinerU / PaddleX<br>(可选)</span></div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="mt-12 grid md:grid-cols-3 gap-6">
+            <div class="arch-card layer-client"><h4 class="text-lg font-semibold mb-3 text-blue-400">分层异步架构</h4><p class="text-sm text-gray-400">基于 FastAPI + LangGraph 的单体分层架构，全链路 async/await，SSE 流式推送，中间件链实现鉴权、限流、日志等横切关注点。</p></div>
+            <div class="arch-card layer-domain"><h4 class="text-lg font-semibold mb-3 text-green-400">RAG + 图谱增强</h4><p class="text-sm text-gray-400">Milvus 向量检索 + LightRAG 图增强双引擎，结合 Neo4j 知识图谱，支持 40+ 文档格式解析与多种 OCR 引擎。</p></div>
+            <div class="arch-card layer-data"><h4 class="text-lg font-semibold mb-3 text-red-400">异构多模态存储</h4><p class="text-sm text-gray-400">SQLite 关系数据 + MinIO 对象存储 + Milvus 向量索引 + Neo4j 图数据库 + 文件系统，按数据特征选择最优存储引擎。</p></div>
+        </section>
+    </main>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <button class="close-btn" onclick="closeDetail()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg>
+        </button>
+        <div id="detailContent"></div>
+    </div>
+
+    <script>
+        const details = {
+            auth: { title: '认证路由 (auth_router)', color: 'purple',
+                features: ['用户登录（user_id/手机号）', 'JWT Token 管理', '首次运行初始化', '用户注册/CRUD', '角色权限控制（superadmin/admin/user）', '头像上传（MinIO）', '账户锁定（指数退避）'],
+                tech: ['FastAPI Dependency', 'PyJWT', 'bcrypt', 'MinIO'],
+                endpoints: ['POST /api/auth/token', 'GET /api/auth/check-first-run', 'POST /api/auth/initialize', 'POST /api/auth/register', 'GET /api/auth/me', 'PUT /api/auth/profile', 'GET /api/auth/users', 'DELETE /api/auth/users/{user_id}'] },
+            chat: { title: '对话路由 (chat_router)', color: 'purple',
+                features: ['多智能体流式对话（SSE）', '线程管理（创建/列表/删除）', '消息反馈（like/dislike）', '附件上传与管理', '人工审批中断与恢复', '多模态图片支持', '智能体配置保存/加载', '内容审核（ContentGuard）'],
+                tech: ['LangGraph', 'SSE StreamingResponse', 'ConversationManager', 'ContentGuard', 'AgentManager'],
+                endpoints: ['GET /api/chat/agent', 'POST /api/chat/agent/{agent_id}', 'POST /api/chat/agent/{agent_id}/resume', 'POST /api/chat/thread', 'GET /api/chat/threads', 'POST /api/chat/message/{id}/feedback', 'POST /api/chat/image/upload'] },
+            kb: { title: '知识库路由 (knowledge_router)', color: 'purple',
+                features: ['知识库 CRUD', '多类型支持（Milvus/LightRAG）', '文档上传与解析', '多格式导出（csv/xlsx/md/txt）', '40+ 文件格式支持', 'Embedding 模型配置', '变更后自动重载智能体'],
+                tech: ['KnowledgeBaseManager', 'KnowledgeBaseFactory', 'Milvus', 'LightRAG', 'MinIO'],
+                endpoints: ['GET /api/knowledge/databases', 'POST /api/knowledge/databases', 'GET /api/knowledge/databases/{db_id}', 'PUT /api/knowledge/databases/{db_id}', 'DELETE /api/knowledge/databases/{db_id}', 'GET /api/knowledge/databases/{db_id}/export'] },
+            graph: { title: '图谱路由 (graph_router)', color: 'purple',
+                features: ['统一图谱列表（Neo4j + LightRAG）', '子图查询（关键词/深度/节点数）', '实体向量索引', 'JSONL 批量导入实体', '图谱标签与统计'],
+                tech: ['Neo4j', 'GraphAdapterFactory', 'Cypher Query', 'LightRAGGraphAdapter'],
+                endpoints: ['GET /api/graph/list', 'GET /api/graph/subgraph', 'GET /api/graph/labels', 'GET /api/graph/stats', 'POST /api/graph/neo4j/index-entities', 'POST /api/graph/neo4j/add-entities'] },
+            eval: { title: '评测路由 (evaluation_router)', color: 'purple',
+                features: ['RAG 检索质量评测', '基准数据集上传（JSONL）', '自动生成基准数据集', '评测指标计算（召回率/准确率）', '评测历史与结果管理'],
+                tech: ['EvaluationService', 'EvaluationMetricsCalculator', 'Tasker'],
+                endpoints: ['POST /api/evaluation/databases/{db_id}/run', 'POST /api/evaluation/databases/{db_id}/benchmarks/upload', 'POST /api/evaluation/databases/{db_id}/benchmarks/generate', 'GET /api/evaluation/databases/{db_id}/results/{task_id}', 'GET /api/evaluation/databases/{db_id}/history'] },
+            mind: { title: '思维导图路由 (mindmap_router)', color: 'purple',
+                features: ['AI 驱动思维导图生成', '基于知识库文件内容', '层级结构自动提取', '自动保存到知识库元数据'],
+                tech: ['KnowledgeBaseManager', 'LLM Generation', 'Markmap JSON'],
+                endpoints: ['POST /api/mindmap/generate', 'GET /api/mindmap/database/{db_id}', 'GET /api/mindmap/databases/{db_id}/files', 'GET /api/mindmap/databases'] },
+            dash: { title: '仪表板路由 (dashboard_router)', color: 'purple',
+                features: ['基础统计（会话/消息/用户/反馈）', '用户活跃度（24h/30d/日分布）', '工具调用统计（成功率/排行）', '智能体分析（满意度/使用量）', '时序数据（14h/14d/14w 三粒度）', '反馈列表（按评分/智能体过滤）'],
+                tech: ['ConversationManager', 'SQLAlchemy Aggregation', 'UTC+8 Timezone'],
+                endpoints: ['GET /api/dashboard/stats', 'GET /api/dashboard/stats/users', 'GET /api/dashboard/stats/tools', 'GET /api/dashboard/stats/agents', 'GET /api/dashboard/stats/calls/timeseries', 'GET /api/dashboard/feedbacks', 'GET /api/dashboard/conversations'] },
+            task: { title: '任务路由 (task_router)', color: 'purple',
+                features: ['异步任务列表（分页）', '按状态过滤', '任务详情查看', '运行中任务取消'],
+                tech: ['Tasker', 'AsyncIO'],
+                endpoints: ['GET /api/tasks', 'GET /api/tasks/{task_id}', 'POST /api/tasks/{task_id}/cancel'] },
+            system: { title: '系统路由 (system_router)', color: 'purple',
+                features: ['健康检查（公开）', '系统配置管理（单项/批量更新）', '系统日志查看（按级别过滤）', 'OCR 服务状态与统计', '模型状态检查（单个/全部）', '自定义 Provider CRUD + 连接测试'],
+                tech: ['Pydantic Config', 'TOML', 'DocumentProcessorFactory', 'Custom Providers'],
+                endpoints: ['GET /api/system/health', 'GET /api/system/config', 'POST /api/system/config/update', 'GET /api/system/logs', 'GET /api/system/ocr/health', 'GET /api/system/chat-models/all/status', 'POST /api/system/custom-providers', 'POST /api/system/custom-providers/{id}/test'] }
+        };
+
+        function showDetail(key) {
+            const data = details[key];
+            const panel = document.getElementById('detailPanel');
+            const content = document.getElementById('detailContent');
+            content.innerHTML =
+                '<h2 class="text-2xl font-bold mb-6" style="color:var(--color-' + data.color + ')">' + data.title + '</h2>' +
+                '<div class="mb-6"><h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">核心功能</h3><ul class="space-y-2">' +
+                data.features.map(function(f) { return '<li class="flex items-start gap-2"><span class="text-green-400 mt-1">&#10003;</span><span class="text-gray-300">' + f + '</span></li>'; }).join('') +
+                '</ul></div>' +
+                '<div class="mb-6"><h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">技术栈</h3><div class="flex flex-wrap gap-2">' +
+                data.tech.map(function(t) { return '<span class="px-3 py-1 bg-white/10 rounded-full text-sm text-gray-300">' + t + '</span>'; }).join('') +
+                '</div></div>' +
+                '<div class="mb-6"><h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">API 端点</h3><div class="space-y-2">' +
+                data.endpoints.map(function(e) { var parts = e.split(' '); return '<div class="font-mono text-sm p-2 bg-white/5 rounded border-l-2 border-purple-500"><span class="text-purple-400">' + parts[0] + '</span> <span class="text-gray-400">' + parts[1] + '</span></div>'; }).join('') +
+                '</div></div>';
+            panel.classList.add('active');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('active');
+        }
+
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.arch-card').forEach(function(card, i) {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: 'top 85%', toggleActions: 'play none none reverse' },
+                y: 50, opacity: 0, duration: 0.6, delay: i * 0.1, ease: 'power2.out'
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            var panel = document.getElementById('detailPanel');
+            if (panel.classList.contains('active') && !panel.contains(e.target) && !e.target.closest('.component-tag')) {
+                closeDetail();
+            }
+        });
+    </script>
+</body>
+</html>
