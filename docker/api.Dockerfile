@@ -48,7 +48,7 @@ COPY uv.lock /app/uv.lock
 ENV UV_PYPI_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-dev --frozen \
+    uv sync --no-install-project --no-dev --frozen \
     --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     --extra-index-url https://mirrors.aliyun.com/pypi/simple
 
