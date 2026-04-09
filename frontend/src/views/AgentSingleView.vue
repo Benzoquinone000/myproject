@@ -44,6 +44,7 @@
       <template #header-left>
         <UserInfoComponent />
         <div
+          v-if="userStore.isAdmin"
           type="button"
           class="agent-nav-btn compact"
           @click="toggleConf"
@@ -63,8 +64,9 @@
       </template>
     </AgentChatComponent>
 
-    <!-- 配置侧边栏（补齐单智能体页面） -->
+    <!-- 配置侧边栏（仅管理员可见） -->
     <AgentConfigSidebar
+      v-if="userStore.isAdmin"
       :isOpen="chatUIStore.isConfigSidebarOpen"
       @close="() => (chatUIStore.isConfigSidebarOpen = false)"
     />
@@ -83,12 +85,14 @@ import UserInfoComponent from '@/components/UserInfoComponent.vue';
 import { ChatExporter } from '@/utils/chatExporter';
 import { handleChatError } from '@/utils/errorHandler';
 import { useAgentStore } from '@/stores/agent';
+import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import { useChatUIStore } from '@/stores/chatUI';
 
 const route = useRoute();
 const router = useRouter();
 const agentStore = useAgentStore();
+const userStore = useUserStore();
 const chatUIStore = useChatUIStore();
 
 const agentId = computed(() => route.params.agent_id);
