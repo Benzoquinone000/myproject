@@ -133,7 +133,11 @@ const handleRegister = async () => {
         phone_number: registerForm.phone_number || null, role: 'user'
       })
     });
-    if (!response.ok) { const error = await response.json(); throw new Error(error.detail || '注册失败'); }
+    if (!response.ok) {
+      let detail = '注册失败';
+      try { const error = await response.json(); detail = error.detail || detail; } catch {}
+      throw new Error(detail);
+    }
     message.success('注册成功，请登录');
     router.push('/login');
   } catch (error) { errorMessage.value = error.message || '注册失败，请重试'; }

@@ -8,6 +8,7 @@ import { useConfigStore } from '@/stores/config'
 import { useDatabaseStore } from '@/stores/database'
 import { useInfoStore } from '@/stores/info'
 import { useTaskerStore } from '@/stores/tasker'
+import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UserInfoComponent from '@/components/UserInfoComponent.vue'
 import DebugComponent from '@/components/DebugComponent.vue'
@@ -18,6 +19,7 @@ const configStore = useConfigStore()
 const databaseStore = useDatabaseStore()
 const infoStore = useInfoStore()
 const taskerStore = useTaskerStore()
+const userStore = useUserStore()
 const { activeCount: activeCountRef, isDrawerOpen } = storeToRefs(taskerStore)
 
 const layoutSettings = reactive({
@@ -67,28 +69,36 @@ const route = useRoute()
 
 const activeTaskCount = computed(() => activeCountRef.value || 0)
 
-const mainList = [{
+const allNavItems = [{
     name: '智能体',
     path: '/agent',
     icon: Bot,
     activeIcon: Bot,
+    adminOnly: true,
   }, {
     name: '图谱',
     path: '/graph',
     icon: Waypoints,
     activeIcon: Waypoints,
+    adminOnly: true,
   }, {
     name: '知识库',
     path: '/database',
     icon: LibraryBig,
     activeIcon: LibraryBig,
+    adminOnly: true,
   }, {
     name: '仪表盘',
     path: '/dashboard',
     icon: BarChart3,
     activeIcon: BarChart3,
+    adminOnly: true,
   }
 ]
+
+const mainList = computed(() =>
+  allNavItems.filter(item => !item.adminOnly || userStore.isAdmin)
+)
 
 provide('settingsModal', {
   openSettingsModal
