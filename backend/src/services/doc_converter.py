@@ -9,7 +9,6 @@ from pathlib import Path
 
 import aiofiles
 from fastapi import UploadFile
-
 from src.config import config as app_config
 from src.knowledge.indexing import process_file_to_markdown
 from src.utils import logger

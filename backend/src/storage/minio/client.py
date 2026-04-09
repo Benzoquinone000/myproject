@@ -10,11 +10,11 @@ from contextlib import asynccontextmanager
 from datetime import timedelta
 from io import BytesIO
 
+from src.utils import logger
 from urllib3 import BaseHTTPResponse
 
 from minio import Minio
 from minio.error import S3Error
-from src.utils import logger
 
 
 class StorageError(Exception):
@@ -312,7 +312,7 @@ class MinIOClient:
         # 验证主机
         endpoint_host = self.endpoint.split("://")[-1].split(":")[0]
         url_host = parsed.netloc.split(":")[0]
-        
+
         # 检查是否是本地地址（localhost, 127.0.0.1, ::1 等）
         def is_localhost(host: str) -> bool:
             """检查主机名是否是本地地址"""
@@ -321,7 +321,7 @@ class MinIOClient:
             host_lower = host.lower()
             localhost_names = ["localhost", "127.0.0.1", "::1", "0.0.0.0"]
             return host_lower in localhost_names or host_lower.startswith("127.")
-        
+
         # 允许的情况：
         # 1. endpoint_host 和 url_host 相同
         # 2. url_host 是 HOST_IP 环境变量（如果设置了）
@@ -332,14 +332,14 @@ class MinIOClient:
             if "://" in host_ip:
                 host_ip = host_ip.split("://")[-1]
             host_ip = host_ip.split(":")[0]
-        
+
         allowed = (
             endpoint_host == url_host
             or (host_ip and url_host == host_ip)
             or is_localhost(url_host)
             or (is_localhost(endpoint_host) and is_localhost(url_host))
         )
-        
+
         if not allowed:
             raise StorageError(f"不允许的外部 URL: {url_host}")
 

@@ -9,16 +9,14 @@ from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import String, cast, distinct, func, or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from server.routers.auth_router import get_admin_user
 from server.utils.auth_middleware import get_db
+from sqlalchemy import String, cast, distinct, func, or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.storage.conversation import ConversationManager
 from src.storage.db.models import User
 from src.utils.datetime_utils import UTC, ensure_shanghai, shanghai_now, utc_now
 from src.utils.logging_config import logger
-
 
 dashboard = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
@@ -231,7 +229,7 @@ async def get_user_activity_stats(
 ):
     """Get user activity statistics (Admin only)"""
     try:
-        from src.storage.db.models import User, Conversation
+        from src.storage.db.models import Conversation, User
 
         now = utc_now()
 
@@ -376,9 +374,10 @@ async def get_knowledge_stats(
 ):
     """Get knowledge base statistics (Admin only)"""
     try:
-        from src.knowledge.manager import KnowledgeBaseManager
         import json
         import os
+
+        from src.knowledge.manager import KnowledgeBaseManager
 
         # 从知识库管理系统获取数据
         kb_manager = KnowledgeBaseManager(work_dir="/app/saves/knowledge_base_data")
@@ -506,7 +505,7 @@ async def get_agent_analytics(
 ):
     """Get AI agent analytics (Admin only)"""
     try:
-        from src.storage.db.models import Conversation, MessageFeedback, Message, ToolCall
+        from src.storage.db.models import Conversation, Message, MessageFeedback, ToolCall
 
         # 获取所有智能体
         agents_result = await db.execute(
@@ -676,7 +675,7 @@ async def get_all_feedbacks(
     current_user: User = Depends(get_admin_user),
 ):
     """Get all feedback records (Admin only)"""
-    from src.storage.db.models import MessageFeedback, Message, Conversation, User
+    from src.storage.db.models import Conversation, Message, MessageFeedback, User
 
     try:
         # Build query with joins including User table

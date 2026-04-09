@@ -3,16 +3,16 @@
 复用 common 工具体系，提供金融场景的工具获取和动态组装能力。
 """
 
-import re
 import json
+import re
 from typing import Any
 
 from langchain_core.tools import StructuredTool
+
 from src.agents.common import get_buildin_tools
 from src.agents.common.mcp import get_mcp_tools
 from src.agents.common.tools import get_kb_based_tools, get_tavily_search, make_knowledge_graph_tool
 from src.utils import logger
-
 
 _INVALID_UNICODE_ESCAPE_RE = re.compile(r"\\u(?![0-9a-fA-F]{4})")
 _MAX_TOOL_OUTPUT_CHARS = 12000
@@ -91,16 +91,21 @@ def _compress_line_chart_input(value: Any) -> Any:
         compressed = {}
         for k, v in value.items():
             key = str(k).lower()
-            if isinstance(v, list) and len(v) > _MAX_LINE_CHART_POINTS and key in {
-                "x",
-                "y",
-                "data",
-                "values",
-                "labels",
-                "points",
-                "series",
-                "datasets",
-            }:
+            if (
+                isinstance(v, list)
+                and len(v) > _MAX_LINE_CHART_POINTS
+                and key
+                in {
+                    "x",
+                    "y",
+                    "data",
+                    "values",
+                    "labels",
+                    "points",
+                    "series",
+                    "datasets",
+                }
+            ):
                 compressed[k] = _downsample_list(v, _MAX_LINE_CHART_POINTS)
             else:
                 compressed[k] = _compress_line_chart_input(v)

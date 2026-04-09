@@ -37,8 +37,7 @@ class Context(BaseContext):
             "options": lambda: list(MCP_SERVERS.keys()),
             "option_labels": lambda: {k: MCP_DISPLAY_LABELS.get(k, k) for k in MCP_SERVERS.keys()},
             "description": (
-                "MCP 服务器列表，选项来自后端 `MCP_SERVERS`；"
-                "stdio 类（如 npx）会在本机或容器内按需启动子进程。"
+                "MCP 服务器列表，选项来自后端 `MCP_SERVERS`；stdio 类（如 npx）会在本机或容器内按需启动子进程。"
             ),
         },
     )

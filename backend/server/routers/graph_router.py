@@ -1,7 +1,6 @@
 import traceback
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
-
 from server.utils.auth_middleware import get_admin_user
 from src import graph_base, knowledge_base
 from src.knowledge.adapters.base import GraphAdapter
@@ -302,12 +301,12 @@ async def delete_neo4j_entities(
 
         # 同步调用删除方法
         graph_base.delete_entity(entity_name=entity_name, kgdb_name=kgdb_name)
-        
+
         if entity_name:
             message = f"实体 '{entity_name}' 删除成功"
         else:
             message = "所有实体删除成功"
-        
+
         return {"success": True, "message": message, "status": "success"}
     except Exception as e:
         logger.error(f"删除实体失败: {e}, {traceback.format_exc()}")

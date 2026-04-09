@@ -200,7 +200,12 @@ async def test_all_chat_models_status() -> dict:
     results = {}
     for model_id, result in zip(tasks.keys(), results_list):
         if isinstance(result, Exception):
-            results[model_id] = {"provider": model_id.split("/")[0], "model_name": model_id, "status": "error", "message": str(result)}
+            results[model_id] = {
+                "provider": model_id.split("/")[0],
+                "model_name": model_id,
+                "status": "error",
+                "message": str(result),
+            }
         else:
             results[model_id] = result
 

@@ -11,8 +11,8 @@ from langchain.agents.middleware import (
 )
 
 from src.agents.common import BaseAgent, load_chat_model
-from src.agents.common.middlewares import inject_attachment_context
 from src.agents.common.mcp import get_all_mcp_tools
+from src.agents.common.middlewares import inject_attachment_context
 from src.agents.common.tools import get_tavily_search
 from src.utils import logger
 

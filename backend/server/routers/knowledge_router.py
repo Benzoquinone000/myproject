@@ -7,8 +7,6 @@ from urllib.parse import quote, unquote
 import aiofiles
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse
-from starlette.responses import StreamingResponse
-
 from server.services.tasker import TaskContext, tasker
 from server.utils.auth_middleware import get_admin_user
 from src import config, knowledge_base
@@ -18,6 +16,7 @@ from src.models.embed import test_all_embedding_models_status, test_embedding_mo
 from src.storage.db.models import User
 from src.storage.minio.client import StorageError, aupload_file_to_minio, get_minio_client
 from src.utils import logger
+from starlette.responses import StreamingResponse
 
 knowledge = APIRouter(prefix="/knowledge", tags=["knowledge"])
 

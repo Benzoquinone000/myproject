@@ -1,8 +1,8 @@
 import traceback
 
-from fastapi import APIRouter, HTTPException, Depends, File, Form, Body, UploadFile
-from src.storage.db.models import User
+from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, UploadFile
 from server.utils.auth_middleware import get_admin_user
+from src.storage.db.models import User
 from src.utils import logger
 
 # 创建路由器

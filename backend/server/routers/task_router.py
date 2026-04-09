@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-
-from src.storage.db.models import User
 from server.services.tasker import tasker
 from server.utils.auth_middleware import get_admin_user
+from src.storage.db.models import User
 
 tasks = APIRouter(prefix="/tasks", tags=["tasks"])
 

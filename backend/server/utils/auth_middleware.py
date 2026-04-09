@@ -3,11 +3,10 @@ import re
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
+from server.utils.auth_utils import AuthUtils
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.storage.db.manager import db_manager
 from src.storage.db.models import User
-from server.utils.auth_utils import AuthUtils
 
 # 定义OAuth2密码承载器，指定token URL
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)

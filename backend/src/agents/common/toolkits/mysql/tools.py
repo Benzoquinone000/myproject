@@ -2,7 +2,6 @@ from typing import Annotated, Any
 
 from langchain.tools import tool
 from pydantic import BaseModel, Field
-
 from src.utils import logger
 
 from .connection import (

@@ -5,7 +5,7 @@
 
 import re
 
-from pypinyin import lazy_pinyin, Style
+from pypinyin import Style, lazy_pinyin
 
 
 def to_pinyin(text: str) -> str:

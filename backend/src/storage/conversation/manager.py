@@ -10,7 +10,6 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-
 from src.storage.db.models import Conversation, ConversationStats, Message, ToolCall
 from src.utils import logger
 from src.utils.datetime_utils import utc_now

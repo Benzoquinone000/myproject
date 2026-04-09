@@ -65,6 +65,7 @@ def _apply_mcp_soft_fail_wrappers(tools: list[Any]) -> list[Any]:
             out.append(_wrap_mcp_tool_soft_fail(tool, hint))
     return out
 
+
 # Global MCP tools cache
 _mcp_tools_cache: dict[str, list[Callable[..., Any]]] = {}
 
@@ -84,11 +85,7 @@ MCP_SERVERS = {
         "args": ["mcp-server-time"],
         "transport": "stdio",
     },
-    "mcp_server_chart": {
-        "command": "npx",
-        "args": ["-y", "@antv/mcp-server-chart"],
-        "transport": "stdio"
-    },
+    "mcp_server_chart": {"command": "npx", "args": ["-y", "@antv/mcp-server-chart"], "transport": "stdio"},
     "china_stock_mcp": {
         "command": "uvx",
         "args": ["china-stock-mcp"],

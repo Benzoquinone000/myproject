@@ -3,21 +3,17 @@ import json
 import traceback
 import uuid
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, UploadFile, File
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import StreamingResponse
-from langchain.messages import AIMessageChunk, HumanMessage, AIMessage
+from langchain.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.types import Command
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
-from src.storage.db.models import User, MessageFeedback, Message, Conversation
-from src.storage.conversation import ConversationManager
-from src.storage.db.manager import db_manager
 from server.routers.auth_router import get_admin_user
 from server.utils.auth_middleware import get_db, get_required_user
-from src import executor
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from src import config as conf
+from src import executor
 from src.agents import agent_manager
 from src.agents.common.tools import gen_tool_info, get_buildin_tools
 from src.models import select_model
@@ -27,9 +23,12 @@ from src.services.doc_converter import (
     MAX_ATTACHMENT_SIZE_BYTES,
     convert_upload_to_markdown,
 )
+from src.storage.conversation import ConversationManager
+from src.storage.db.manager import db_manager
+from src.storage.db.models import Conversation, Message, MessageFeedback, User
 from src.utils.datetime_utils import utc_isoformat
-from src.utils.logging_config import logger
 from src.utils.image_processor import process_uploaded_image
+from src.utils.logging_config import logger
 
 
 # 图片上传响应模型
@@ -637,7 +636,9 @@ async def chat_agent(
                 # After streaming finished, check for interrupts and save messages
 
                 # Check for human approval interrupts
-                async for chunk in check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id, input_context=input_context):
+                async for chunk in check_and_handle_interrupts(
+                    agent, langgraph_config, make_chunk, meta, thread_id, input_context=input_context
+                ):
                     yield chunk
 
                 meta["time_cost"] = asyncio.get_event_loop().time() - start_time

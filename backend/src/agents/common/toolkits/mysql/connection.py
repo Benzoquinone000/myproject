@@ -7,7 +7,6 @@ from typing import Any
 import pymysql
 from pymysql import MySQLError
 from pymysql.cursors import DictCursor
-
 from src.utils import logger
 
 

@@ -4,7 +4,6 @@ import logging
 
 from fastapi import Request
 from sqlalchemy.orm import Session
-
 from src.storage.db.models import OperationLog, User
 
 

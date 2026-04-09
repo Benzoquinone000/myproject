@@ -1,18 +1,17 @@
 import re
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.storage.db.manager import db_manager
-from src.storage.db.models import User
 from server.utils.auth_middleware import get_admin_user, get_current_user, get_db, get_required_user
 from server.utils.auth_utils import AuthUtils
-from server.utils.user_utils import generate_unique_user_id, validate_username, is_valid_phone_number
 from server.utils.common_utils import log_operation
+from server.utils.user_utils import generate_unique_user_id, is_valid_phone_number, validate_username
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.storage.db.manager import db_manager
+from src.storage.db.models import User
 from src.storage.minio import aupload_file_to_minio
 from src.utils.datetime_utils import utc_now
 
@@ -386,9 +385,7 @@ async def register_user(
     await db.refresh(new_user)
 
     # 记录操作（使用新注册用户的id）
-    await log_operation(
-        db, new_user.id, "用户注册", f"用户注册: {user_data.username}", request
-    )
+    await log_operation(db, new_user.id, "用户注册", f"用户注册: {user_data.username}", request)
 
     return new_user.to_dict()
 

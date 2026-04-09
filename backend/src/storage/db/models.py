@@ -3,7 +3,6 @@ import datetime as dt
 from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
 from src.utils.datetime_utils import coerce_datetime, utc_isoformat, utc_now
 
 Base = declarative_base()

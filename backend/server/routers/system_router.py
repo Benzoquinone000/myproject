@@ -1,14 +1,13 @@
 import os
-import aiofiles
 from pathlib import Path
 
+import aiofiles
 import yaml
 from fastapi import APIRouter, Body, Depends, HTTPException
-
-from src.storage.db.models import User
 from server.utils.auth_middleware import get_admin_user
 from src import config
-from src.models.chat import test_chat_model_status, test_all_chat_models_status
+from src.models.chat import test_all_chat_models_status, test_chat_model_status
+from src.storage.db.models import User
 from src.utils.logging_config import logger
 
 system = APIRouter(prefix="/system", tags=["system"])
@@ -102,7 +101,9 @@ async def load_info_config():
     """加载信息配置文件"""
     try:
         # 配置文件路径
-        brand_file_path = os.environ.get("BRAND_FILE_PATH", os.environ.get("YUXI_BRAND_FILE_PATH", "src/config/static/info.local.yaml"))
+        brand_file_path = os.environ.get(
+            "BRAND_FILE_PATH", os.environ.get("YUXI_BRAND_FILE_PATH", "src/config/static/info.local.yaml")
+        )
         config_path = Path(brand_file_path)
 
         # 检查文件是否存在

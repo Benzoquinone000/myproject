@@ -96,18 +96,18 @@ def _convert_graph_to_triples(nodes: list, edges: list) -> list:
     triples = []
     # 创建节点ID到名称的映射
     node_map = {node.get("id"): node.get("name", node.get("id", "")) for node in nodes}
-    
+
     for edge in edges:
         source_id = edge.get("source_id")
         target_id = edge.get("target_id")
         relation = edge.get("type", edge.get("edge_type", ""))
-        
+
         source_name = node_map.get(source_id, source_id)
         target_name = node_map.get(target_id, target_id)
-        
+
         if source_name and target_name and relation:
             triples.append([source_name, relation, target_name])
-    
+
     return triples
 
 
@@ -121,10 +121,10 @@ def query_knowledge_graph_impl(query: str, db_names: list[str] | None = None) ->
     """内部实现：可选地限制查询范围到指定知识库（db_names 为知识库名称）。"""
     try:
         logger.debug(f"Querying knowledge graph with: {query}, db_names={db_names}")
-        
+
         # 收集所有三元组
         all_triples = []
-        
+
         # 1. 查询 upload 类型的图谱
         try:
             upload_result = graph_base.query_node(query, hops=2, return_format="triples")
@@ -133,11 +133,11 @@ def query_knowledge_graph_impl(query: str, db_names: list[str] | None = None) ->
                 logger.debug(f"Upload graph returned {len(upload_result['triples'])} triples")
         except Exception as e:
             logger.warning(f"Failed to query upload graph: {e}")
-        
+
         # 2. 查询所有 lightrag 类型的图谱
         try:
             from src.knowledge.adapters.lightrag import LightRAGGraphAdapter
-            
+
             lightrag_dbs = knowledge_base.get_lightrag_databases()
             logger.debug(f"Found {len(lightrag_dbs)} LightRAG databases to query")
 
@@ -145,20 +145,21 @@ def query_knowledge_graph_impl(query: str, db_names: list[str] | None = None) ->
             if db_names:
                 allowed_names = set(db_names)
                 lightrag_dbs = [
-                    db for db in lightrag_dbs
+                    db
+                    for db in lightrag_dbs
                     if (db.get("name") in allowed_names) or (db.get("db_name") in allowed_names)
                 ]
                 logger.debug(f"Filtered LightRAG databases by db_names, remaining={len(lightrag_dbs)}")
-            
+
             for db in lightrag_dbs:
                 db_id = db.get("db_id")
                 if not db_id:
                     continue
-                
+
                 try:
                     # 创建适配器并查询
                     adapter = LightRAGGraphAdapter(config={"kb_id": db_id})
-                    
+
                     # 处理异步调用
                     # 尝试使用 asyncio.run，如果已经有事件循环在运行则使用其他方法
                     try:
@@ -167,30 +168,27 @@ def query_knowledge_graph_impl(query: str, db_names: list[str] | None = None) ->
                         # 如果有运行中的循环，我们需要在新线程中运行
                         with concurrent.futures.ThreadPoolExecutor() as executor:
                             future = executor.submit(
-                                asyncio.run,
-                                adapter.query_nodes(query, max_nodes=50, max_depth=2, kb_id=db_id)
+                                asyncio.run, adapter.query_nodes(query, max_nodes=50, max_depth=2, kb_id=db_id)
                             )
                             result = future.result(timeout=30)
                     except RuntimeError:
                         # 没有运行中的循环，直接使用 asyncio.run
-                        result = asyncio.run(
-                            adapter.query_nodes(query, max_nodes=50, max_depth=2, kb_id=db_id)
-                        )
-                    
+                        result = asyncio.run(adapter.query_nodes(query, max_nodes=50, max_depth=2, kb_id=db_id))
+
                     # 转换为三元组
                     nodes = result.get("nodes", [])
                     edges = result.get("edges", [])
                     triples = _convert_graph_to_triples(nodes, edges)
                     all_triples.extend(triples)
                     logger.debug(f"LightRAG database {db_id} returned {len(triples)} triples")
-                    
+
                 except Exception as e:
                     logger.warning(f"Failed to query LightRAG database {db_id}: {e}")
                     continue
-                    
+
         except Exception as e:
             logger.warning(f"Failed to query LightRAG graphs: {e}")
-        
+
         # 去重三元组
         seen_triples = set()
         dedup_triples = []
@@ -200,13 +198,11 @@ def query_knowledge_graph_impl(query: str, db_names: list[str] | None = None) ->
             if triple_tuple not in seen_triples:
                 seen_triples.add(triple_tuple)
                 dedup_triples.append(triple if isinstance(triple, list) else list(triple_tuple))
-        
+
         result = {"triples": dedup_triples}
-        logger.debug(
-            f"Knowledge graph query returned {len(dedup_triples)} total triples"
-        )
+        logger.debug(f"Knowledge graph query returned {len(dedup_triples)} total triples")
         return result
-        
+
     except Exception as e:
         logger.error(f"Knowledge graph query error: {e}, {traceback.format_exc()}")
         return f"知识图谱查询失败: {str(e)}"

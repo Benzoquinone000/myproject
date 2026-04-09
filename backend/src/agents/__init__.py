@@ -4,6 +4,7 @@ import inspect
 from pathlib import Path
 
 from server.utils.singleton import SingletonMeta
+
 from src.agents.common import BaseAgent
 from src.utils import logger
 

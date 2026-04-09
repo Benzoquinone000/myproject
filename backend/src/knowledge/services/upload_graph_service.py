@@ -355,9 +355,11 @@ class UploadGraphService:
                 self.save_graph_info(kgdb_name)
                 # 验证配置是否正确
                 graph_info = self.get_graph_info(kgdb_name)
-                logger.info(f"删除后图谱信息: entity_count={graph_info.get('entity_count')}, "
-                          f"embed_model_configurable={graph_info.get('embed_model_configurable')}, "
-                          f"is_initialized_from_file={self.is_initialized_from_file}")
+                logger.info(
+                    f"删除后图谱信息: entity_count={graph_info.get('entity_count')}, "
+                    f"embed_model_configurable={graph_info.get('embed_model_configurable')}, "
+                    f"is_initialized_from_file={self.is_initialized_from_file}"
+                )
 
     def _delete_specific_entity(self, tx, entity_name):
         query = """
@@ -375,7 +377,7 @@ class UploadGraphService:
         DETACH DELETE n
         """
         tx.run(query)
-        
+
         # 删除所有 RELATION 类型的关系（这些关系只属于默认图谱）
         query_relations = """
         MATCH ()-[r:RELATION]->()
@@ -506,7 +508,7 @@ class UploadGraphService:
             else:
                 self.is_initialized_from_file = False
                 logger.info("图谱为空，允许重新配置嵌入模型")
-            
+
             logger.info(f"已加载图数据库信息，最后更新时间：{graph_info.get('last_updated')}")
             return True
         except Exception as e:

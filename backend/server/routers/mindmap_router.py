@@ -9,15 +9,14 @@
 
 import asyncio
 import json
-import traceback
 import textwrap
+import traceback
 
 from fastapi import APIRouter, Body, Depends, HTTPException
-
-from src.storage.db.models import User
 from server.utils.auth_middleware import get_admin_user
 from src import knowledge_base
 from src.models import select_model
+from src.storage.db.models import User
 from src.utils import logger
 
 mindmap = APIRouter(prefix="/mindmap", tags=["mindmap"])

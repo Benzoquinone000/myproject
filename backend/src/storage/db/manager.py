@@ -4,11 +4,10 @@ import os
 import pathlib
 from contextlib import asynccontextmanager, contextmanager
 
+from server.utils.singleton import SingletonMeta
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-from server.utils.singleton import SingletonMeta
 from src import config
 from src.storage.db.models import Base, User
 from src.utils import logger

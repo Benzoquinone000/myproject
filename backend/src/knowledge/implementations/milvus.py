@@ -9,9 +9,8 @@ from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connec
 
 from src import config
 from src.knowledge.base import FileStatus, KnowledgeBase
-from src.knowledge.indexing import process_file_to_markdown
 from src.knowledge.chunking.ragflow_like.dispatcher import chunk_markdown
-from src.knowledge.chunking.ragflow_like.presets import resolve_chunk_processing_params
+from src.knowledge.indexing import process_file_to_markdown
 from src.knowledge.utils.kb_utils import get_embedding_config
 from src.models.embed import OtherEmbedding
 from src.utils import hashstr, logger

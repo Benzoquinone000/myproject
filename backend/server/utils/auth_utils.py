@@ -4,7 +4,6 @@ from datetime import timedelta
 from typing import Any
 
 import jwt
-
 from src.utils.datetime_utils import utc_now
 
 # JWT配置
