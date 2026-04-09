@@ -168,7 +168,21 @@ export const agentApi = {
       },
       ...restOptions
     })
-  }
+  },
+
+  /**
+   * 请求服务端停止当前线程上的生成（用户点击「停止」时应先于 abort 调用）
+   */
+  cancelAgentGeneration: (agentId, threadId) =>
+    apiPost(`/api/chat/agent/${agentId}/cancel_generation`, { thread_id: threadId }),
+
+  /**
+   * 是否仍有后台生成任务（断线重连后轮询用）
+   */
+  getGenerationStatus: (agentId, threadId) =>
+    apiGet(
+      `/api/chat/agent/${agentId}/generation_status?thread_id=${encodeURIComponent(threadId)}`
+    )
 }
 
 

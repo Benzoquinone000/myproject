@@ -589,6 +589,31 @@ const fetchThreadMessagesWithRetry = async ({
   }
 };
 
+/** 断线后服务端可能仍在生成：轮询直到任务结束或超时（默认最长 1 小时） */
+const waitForBackgroundGenerationEnd = async (
+  agentId,
+  threadId,
+  threadState,
+  maxMs = 3600000,
+  intervalMs = 2000
+) => {
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    await new Promise((r) => setTimeout(r, intervalMs));
+    try {
+      const st = await agentApi.getGenerationStatus(agentId, threadId);
+      await fetchThreadMessages({ agentId, threadId, delay: 0 });
+      if (!st.generating) {
+        threadState.isStreaming = false;
+        return;
+      }
+    } catch (e) {
+      console.warn('[generation poll]', e);
+    }
+  }
+  threadState.isStreaming = false;
+};
+
 const fetchAgentState = async (agentId, threadId) => {
   if (!agentId || !threadId) return;
   try {
@@ -821,16 +846,25 @@ const handleSendMessage = async ({ image } = {}) => {
     } else {
       console.warn("[Interrupted] Catch");
     }
-    threadState.isStreaming = false;
+    if (error.name === 'AbortError') {
+      threadState.isStreaming = false;
+    }
   } finally {
     threadState.streamAbortController = null;
-    // 异步加载历史记录，保持当前消息显示直到历史记录加载完成
-    fetchThreadMessagesWithRetry({ agentId: currentAgentId.value, threadId: threadId })
-    .finally(() => {
-      // 历史记录加载完成后，安全地清空当前进行中的对话
-      resetOnGoingConv(threadId);
-      scrollController.scrollToBottom();
-    });
+  }
+
+  if (threadState.isStreaming) {
+    message.info('连接不稳定，正在等待服务端完成生成…');
+    await waitForBackgroundGenerationEnd(currentAgentId.value, threadId, threadState);
+  }
+
+  try {
+    await fetchThreadMessagesWithRetry({ agentId: currentAgentId.value, threadId: threadId });
+  } catch (error) {
+    handleChatError(error, 'load');
+  } finally {
+    resetOnGoingConv(threadId);
+    scrollController.scrollToBottom();
   }
 };
 
@@ -839,7 +873,11 @@ const handleSendOrStop = async (payload) => {
   const threadId = currentChatId.value;
   const threadState = getThreadState(threadId);
   if (isProcessing.value && threadState && threadState.streamAbortController) {
-    // 中断生成
+    try {
+      await agentApi.cancelAgentGeneration(currentAgentId.value, threadId);
+    } catch (e) {
+      console.warn('cancelAgentGeneration', e);
+    }
     threadState.streamAbortController.abort();
 
     // 中断后刷新消息历史，确保显示最新的状态
