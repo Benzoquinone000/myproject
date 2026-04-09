@@ -304,7 +304,7 @@ async def save_messages_from_langgraph_state(
         logger.error(traceback.format_exc())
 
 
-async def check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id):
+async def check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id, input_context=None):
     """检查并处理 LangGraph 中断状态，发送人工审批请求到前端"""
     try:
         # 获取 agent 的 graph 对象
@@ -637,7 +637,7 @@ async def chat_agent(
                 # After streaming finished, check for interrupts and save messages
 
                 # Check for human approval interrupts
-                async for chunk in check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id):
+                async for chunk in check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id, input_context=input_context):
                     yield chunk
 
                 meta["time_cost"] = asyncio.get_event_loop().time() - start_time
@@ -818,10 +818,10 @@ async def resume_agent_chat(
 
         # 使用 Command(resume=approved) 恢复执行
         resume_command = Command(resume=approved)
+        input_context = {"user_id": str(current_user.id), "thread_id": thread_id}
         graph = await agent.get_graph(input_context=input_context)
 
         # 加载 context（包含 tools, model 等配置）
-        input_context = {"user_id": str(current_user.id), "thread_id": thread_id}
         context = agent.context_schema.from_file(module_name=agent.module_name, input_context=input_context)
         logger.debug(f"Resume with context: {context}")
 
