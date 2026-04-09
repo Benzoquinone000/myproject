@@ -17,6 +17,10 @@ from src.utils import logger
 _INVALID_UNICODE_ESCAPE_RE = re.compile(r"\\u(?![0-9a-fA-F]{4})")
 _MAX_TOOL_OUTPUT_CHARS = 12000
 _MAX_LINE_CHART_POINTS = 300
+_FINANCE_MCP_GENERIC_SOFT_FAIL = (
+    "MCP 工具调用失败，已自动跳过该步骤。"
+    "请改用其它工具继续分析，勿重复调用同一失败工具。"
+)
 
 
 def _sanitize_news_tool_input(value: Any) -> Any:
@@ -144,7 +148,8 @@ def _patch_news_tool(tool: Any) -> Any:
                 except Exception as e2:
                     # 降级为可读文本，避免整个对话流中断
                     return f"新闻工具调用失败（已自动清洗参数后重试仍失败）: {e2}"
-            raise
+            logger.warning("MCP news tool failed: %s", e)
+            return f"新闻工具调用失败（已自动降级）: {e}"
 
     def _safe_func(**kwargs):
         sanitized = _sanitize_news_tool_input(kwargs)
@@ -160,7 +165,8 @@ def _patch_news_tool(tool: Any) -> Any:
                     return _truncate_tool_output(result)
                 except Exception as e2:
                     return f"新闻工具调用失败（已自动清洗参数后重试仍失败）: {e2}"
-            raise
+            logger.warning("MCP news tool failed (sync): %s", e)
+            return f"新闻工具调用失败（已自动降级）: {e}"
 
     # 返回新的 StructuredTool，避免给 Pydantic 对象动态加字段导致报错
     return StructuredTool.from_function(
@@ -180,21 +186,29 @@ def _patch_generic_mcp_tool(tool: Any) -> Any:
 
     async def _safe_coroutine(**kwargs):
         input_data = kwargs
-        if "generate_line_chart" in tool_name:
-            input_data = _compress_line_chart_input(kwargs)
-            if input_data != kwargs:
-                logger.info(f"Compressed input points for tool: {tool_name}")
-        result = await tool.ainvoke(input_data)
-        return _truncate_tool_output(result)
+        try:
+            if "generate_line_chart" in tool_name:
+                input_data = _compress_line_chart_input(kwargs)
+                if input_data != kwargs:
+                    logger.info(f"Compressed input points for tool: {tool_name}")
+            result = await tool.ainvoke(input_data)
+            return _truncate_tool_output(result)
+        except Exception as e:
+            logger.warning("MCP tool failed in finance wrapper '%s': %s", tool_name, e)
+            return _FINANCE_MCP_GENERIC_SOFT_FAIL
 
     def _safe_func(**kwargs):
         input_data = kwargs
-        if "generate_line_chart" in tool_name:
-            input_data = _compress_line_chart_input(kwargs)
-            if input_data != kwargs:
-                logger.info(f"Compressed input points for tool: {tool_name} (sync)")
-        result = tool.invoke(input_data)
-        return _truncate_tool_output(result)
+        try:
+            if "generate_line_chart" in tool_name:
+                input_data = _compress_line_chart_input(kwargs)
+                if input_data != kwargs:
+                    logger.info(f"Compressed input points for tool: {tool_name} (sync)")
+            result = tool.invoke(input_data)
+            return _truncate_tool_output(result)
+        except Exception as e:
+            logger.warning("MCP tool failed in finance wrapper (sync) '%s': %s", tool_name, e)
+            return _FINANCE_MCP_GENERIC_SOFT_FAIL
 
     return StructuredTool.from_function(
         func=_safe_func,
@@ -273,7 +287,7 @@ async def get_orchestrator_tools(
 
 
 # 数据子智能体加载的 MCP（与 MCP_SERVERS 键一致）
-_DATA_AGENT_MCP_NAMES = frozenset({"pozansky-stock-server", "time"})
+_DATA_AGENT_MCP_NAMES = frozenset({"china-stock-mcp", "time"})
 
 
 async def get_data_agent_tools(mcps: list[str] | None = None, knowledges: list[str] | None = None) -> list[Any]:
@@ -285,7 +299,7 @@ async def get_data_agent_tools(mcps: list[str] | None = None, knowledges: list[s
     if tavily:
         tools.append(tavily)
 
-    # 股票行情 / 时间 MCP（按需勾选）
+    # 股票/时间 MCP（按需勾选）
     if mcps:
         for name in mcps:
             if name in _DATA_AGENT_MCP_NAMES:

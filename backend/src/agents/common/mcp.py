@@ -19,11 +19,17 @@ _MCP_SOFT_FAIL_BY_NAME_SUBSTR: tuple[tuple[str, str], ...] = (
     ),
 )
 
-# pozansky-stock-server（本地 uvx 包）上工具的通用兜底：列数不匹配、无表格等
-_POZANSKY_STOCK_MCP_GENERIC_SOFT_FAIL = (
-    "【股票数据工具暂不可用】数据源返回异常或格式不匹配（如列数不一致、无表格数据等），"
-    "已跳过本步。请改用搜索、知识库或其它工具继续完成任务，勿重复调用同一工具。"
+_MCP_GENERIC_SOFT_FAIL = (
+    "【MCP工具暂不可用】当前调用失败，已自动跳过本步骤。"
+    "请继续使用其它可用工具完成任务，勿重复调用同一失败工具。"
 )
+
+
+def _resolve_soft_fail_message(tool_name: str) -> str:
+    for substr, message in _MCP_SOFT_FAIL_BY_NAME_SUBSTR:
+        if substr in tool_name:
+            return message
+    return _MCP_GENERIC_SOFT_FAIL
 
 
 def _wrap_mcp_tool_soft_fail(inner: Any, user_hint: str) -> Any:
@@ -60,30 +66,7 @@ def _apply_mcp_soft_fail_wrappers(tools: list[Any]) -> list[Any]:
     out: list[Any] = []
     for tool in tools:
         name = str(getattr(tool, "name", "") or "")
-        hint: str | None = None
-        for substr, message in _MCP_SOFT_FAIL_BY_NAME_SUBSTR:
-            if substr in name:
-                hint = message
-                break
-        if hint is None:
-            out.append(tool)
-        else:
-            out.append(_wrap_mcp_tool_soft_fail(tool, hint))
-    return out
-
-
-def _wrap_pozansky_stock_mcp_tools(tools: list[Any]) -> list[Any]:
-    """对股票 MCP 全部工具做异常兜底，避免单次工具失败中断整轮流式对话。"""
-    out: list[Any] = []
-    for tool in tools:
-        name = str(getattr(tool, "name", "") or "")
-        hint: str | None = None
-        for substr, message in _MCP_SOFT_FAIL_BY_NAME_SUBSTR:
-            if substr in name:
-                hint = message
-                break
-        if hint is None:
-            hint = _POZANSKY_STOCK_MCP_GENERIC_SOFT_FAIL
+        hint = _resolve_soft_fail_message(name)
         out.append(_wrap_mcp_tool_soft_fail(tool, hint))
     return out
 
@@ -108,10 +91,9 @@ MCP_SERVERS = {
         "transport": "stdio",
     },
     "mcp_server_chart": {"command": "npx", "args": ["-y", "@antv/mcp-server-chart"], "transport": "stdio"},
-    # 本地 stdio：uvx 拉起 pozansky-stock-server（与 Cursor command/args 一致，需本机已装 uv）
-    "pozansky-stock-server": {
+    "china-stock-mcp": {
         "command": "uvx",
-        "args": ["pozansky-stock-server"],
+        "args": ["china-stock-mcp"],
         "transport": "stdio",
     },
 }
@@ -121,7 +103,7 @@ MCP_DISPLAY_LABELS: dict[str, str] = {
     "sequentialthinking": "顺序思考（远程）",
     "time": "时间（mcp-server-time / uvx）",
     "mcp_server_chart": "AntV 图表 MCP（npx）",
-    "pozansky-stock-server": "股票行情（Pozansky / uvx 本地）",
+    "china-stock-mcp": "中国股票 MCP（uvx）",
 }
 
 
@@ -157,10 +139,7 @@ async def get_mcp_tools(server_name: str, additional_servers: dict[str, dict] = 
         # Get all tools and filter by server (if tools have server metadata)
         all_tools = await client.get_tools()
         tools = cast(list[Callable[..., Any]], all_tools)
-        if server_name == "pozansky-stock-server":
-            tools = _wrap_pozansky_stock_mcp_tools(tools)
-        else:
-            tools = _apply_mcp_soft_fail_wrappers(tools)
+        tools = _apply_mcp_soft_fail_wrappers(tools)
 
         _mcp_tools_cache[server_name] = tools
         logger.info(f"Loaded {len(tools)} tools from MCP server '{server_name}'")

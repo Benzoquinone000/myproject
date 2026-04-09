@@ -170,7 +170,7 @@ class FinanceAgent(BaseAgent):
             {
                 "name": "finance-data-agent",
                 "description": (
-                    "金融数据获取员。负责使用股票行情工具、网页搜索和知识库获取行情、基本面、新闻等数据。"
+                    "金融数据获取员。负责使用股票行情 MCP、网页搜索和知识库获取行情、基本面、新闻等数据。"
                     "将数据要点写入 finance_workspace/data_notes.md。"
                 ),
                 "system_prompt": FINANCE_DATA_PROMPT,
