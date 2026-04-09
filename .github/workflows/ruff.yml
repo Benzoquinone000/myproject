@@ -56,9 +56,10 @@ jobs:
           python-version: '3.12'
 
       # 4. 安装 ruff 依赖（根据项目配置，ruff 在 dev 依赖组中）
+      # 覆盖国内镜像源，GitHub Actions 在海外无法访问清华镜像
       - name: Install dependencies
         run: |
-          uv sync --group dev
+          uv sync --group dev --index-url https://pypi.org/simple
 
       # 5. 运行 Ruff 格式检查（与项目的 make lint 命令一致）
       - name: Run Ruff format check
