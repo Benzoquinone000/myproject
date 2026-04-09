@@ -92,9 +92,8 @@ MCP_SERVERS = {
     },
     "mcp_server_chart": {"command": "npx", "args": ["-y", "@antv/mcp-server-chart"], "transport": "stdio"},
     "china-stock-mcp": {
-        # Use proxy to filter non-JSON stdout lines from upstream server.
-        "command": "python",
-        "args": ["-m", "src.agents.common.mcp_stdio_proxy", "uvx", "china-stock-mcp"],
+        "command": "uvx",
+        "args": ["china-stock-mcp"],
         "transport": "stdio",
     },
 }
