@@ -385,9 +385,9 @@ async def register_user(
     await db.commit()
     await db.refresh(new_user)
 
-    # 记录操作（没有current_user，使用None）
+    # 记录操作（使用新注册用户的id）
     await log_operation(
-        db, None, "用户注册", f"用户注册: {user_data.username}", request
+        db, new_user.id, "用户注册", f"用户注册: {user_data.username}", request
     )
 
     return new_user.to_dict()
