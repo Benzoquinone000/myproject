@@ -272,8 +272,12 @@ async def get_orchestrator_tools(
     return selected_tools
 
 
+# 数据子智能体加载的 MCP（与 MCP_SERVERS 键一致）
+_DATA_AGENT_MCP_NAMES = frozenset({"pozansky-stock-server", "time"})
+
+
 async def get_data_agent_tools(mcps: list[str] | None = None, knowledges: list[str] | None = None) -> list[Any]:
-    """数据获取子智能体的工具集：股票行情 MCP + 搜索 + 知识库"""
+    """数据获取子智能体的工具集：搜索 + 可选股票/时间 MCP + 知识库"""
     tools = []
 
     # Tavily 搜索
@@ -281,10 +285,10 @@ async def get_data_agent_tools(mcps: list[str] | None = None, knowledges: list[s
     if tavily:
         tools.append(tavily)
 
-    # 股票行情 MCP
+    # 股票行情 / 时间 MCP（按需勾选）
     if mcps:
         for name in mcps:
-            if name in ("china_stock_mcp", "time"):
+            if name in _DATA_AGENT_MCP_NAMES:
                 mcp_tools = await get_mcp_tools(name)
                 tools.extend(_patch_mcp_tools(mcp_tools))
 

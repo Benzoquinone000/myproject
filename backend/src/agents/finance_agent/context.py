@@ -53,7 +53,8 @@ class FinanceContext(BaseContext):
             "options": lambda: list(MCP_SERVERS.keys()),
             "option_labels": lambda: {k: MCP_DISPLAY_LABELS.get(k, k) for k in MCP_SERVERS.keys()},
             "description": (
-                "MCP 服务器列表。金融场景建议启用 china_stock_mcp（A股行情）和 mcp_server_chart（图表生成）。"
+                "MCP 服务器列表。金融场景建议启用 pozansky-stock-server（股票行情）、"
+                "mcp_server_chart（图表生成）；需要当前时间时可启用 time，并配合搜索与知识库。"
             ),
         },
     )

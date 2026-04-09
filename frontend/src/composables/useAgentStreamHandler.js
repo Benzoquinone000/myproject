@@ -62,6 +62,10 @@ const processStreamResponse = async (response, onChunk) => {
   }
 };
 
+/** 部分数据源返回格式异常时，不弹红色错误，仅记日志 */
+const BENIGN_STREAM_ERROR_RE =
+  /Length mismatch:\s*Expected axis|No tables found|AxisError|pandas\.errors/i;
+
 export function useAgentStreamHandler({
   getThreadState,
   processApprovalInStream,
@@ -77,7 +81,7 @@ export function useAgentStreamHandler({
    * @returns {Boolean} - Returns true if processing should stop (e.g. error, finished, interrupted)
    */
   const handleStreamChunk = (chunk, threadId) => {
-    const { status, msg, request_id, message: chunkMessage } = chunk;
+    const { status, msg, request_id, message: chunkMessage, error_message: chunkErrorMessage } = chunk;
     const threadState = getThreadState(threadId);
 
     if (!threadState) return false;
@@ -96,19 +100,22 @@ export function useAgentStreamHandler({
         }
         return false;
 
-      case 'error':
-        handleChatError({ message: chunkMessage }, 'stream');
-        // Stop the loading indicator
+      case 'error': {
+        const errText = String(chunkErrorMessage || chunkMessage || '');
+        if (BENIGN_STREAM_ERROR_RE.test(errText)) {
+          console.warn('[stream] 已跳过可忽略的数据工具错误:', errText);
+        } else {
+          handleChatError({ message: errText || undefined }, 'stream');
+        }
         if (threadState) {
           threadState.isStreaming = false;
-
-          // Abort the stream controller to stop processing further events
           if (threadState.streamAbortController) {
             threadState.streamAbortController.abort();
             threadState.streamAbortController = null;
           }
         }
         return true;
+      }
 
       case 'human_approval_required':
         // 使用审批 composable 处理审批请求

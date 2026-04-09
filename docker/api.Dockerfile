@@ -17,21 +17,15 @@ ENV TZ=Asia/Shanghai \
 
 RUN npm install -g npm@latest && npm cache clean --force
 
-# 设置代理和时区，更换镜像源，安装系统依赖 - 合并为一个RUN减少层数
+# 设置时区并安装系统依赖（使用 Debian / PyPI 官方源，不替换为国内镜像站）
 RUN set -ex \
-    # (A) 设置时区
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    # (B) 替换清华源 (针对 Debian Bookworm 的新版格式)
-    && sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources \
-    && sed -i 's|security.debian.org/debian-security|mirrors.tuna.tsinghua.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources \
-    # (C) 安装必要的系统库
     && apt-get update \
     && apt-get install -y --no-install-recommends --fix-missing \
         curl \
         ffmpeg \
         libsm6 \
         libxext6 \
-    # (D) 清理垃圾，减小体积
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -42,15 +36,10 @@ COPY .python-version /app/.python-version
 COPY uv.lock /app/uv.lock
 
 
-# 如果需要代理，可在此处按需添加 ARG/ENV
-
-# 使用国内 PyPI 镜像源进行依赖同步，尽量避免访问官方 PyPI
-ENV UV_PYPI_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+# 如需 HTTP 代理，可在此处按需添加 ARG/ENV
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-install-project --no-dev \
-    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    --extra-index-url https://mirrors.aliyun.com/pypi/simple
+    uv sync --no-install-project --no-dev
 
 # 激活虚拟环境并添加到PATH
 ENV PATH="/app/.venv/bin:$PATH"
