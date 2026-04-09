@@ -37,6 +37,7 @@ pnpm-debug.log*
 docker/volumes/
 saves/
 models/
+!backend/src/models/
 *.db
 *.sqlite
 *.sqlite3
